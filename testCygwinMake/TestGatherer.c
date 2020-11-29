@@ -208,7 +208,7 @@ bool isTestCaseDefinition(char* line)
 
     int length = 0;
     char* currentPtr = line;
-    while(*currentPtr != '\0')
+    while(*currentPtr != '\0' && *currentPtr != '\n')
     {
         if(*currentPtr == ' ')
         {
@@ -251,7 +251,7 @@ void trimTestName(char* testName)
 
     int count = 0;
     char* currentPtr = testName;
-    while(*currentPtr != '\0')
+    while(*currentPtr != '\0' && *currentPtr != '\n')
     {
         count++;   
         currentPtr++;
