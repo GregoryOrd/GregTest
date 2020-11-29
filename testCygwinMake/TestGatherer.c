@@ -6,70 +6,38 @@
 
 #define WINDOWS_MAX_PATH_LENGTH 260
 
-int listFilesRecursively(const char *basePath);
-void getFilePaths(char** filePaths, int* count, const char *basePath);
-void printStringArray(char** str);
+typedef struct FileList{
+    int size;
+    char** files;
+} FileList;
 
-  
+void loadFilePaths(FileList* fileList, const char* basePath);
+void printFileList(const FileList fileList);
+void addFileToList(FileList* list, const char* path);
+void freeFileListFiles(FileList* list);
+
+
 int main(void) 
 { 
-    char dir[WINDOWS_MAX_PATH_LENGTH] = ".";
-    int numFolders = listFilesRecursively(dir);
+    const char dir[WINDOWS_MAX_PATH_LENGTH] = ".";
 
-    int* count = (int*)malloc(sizeof(int));
-    *count = 0;
+    FileList* fileList = (FileList*)malloc(sizeof(FileList*));
+    fileList->size = 0;
+    fileList->files = (char**)malloc(sizeof(char*));
+    fileList->files[0] = NULL;
 
-    char** filePaths = (char**)malloc(numFolders * WINDOWS_MAX_PATH_LENGTH * sizeof(char*) - 1);
-    for(int i = 0; i < numFolders; i++)
-    {
-        filePaths[i] = (char*)malloc(WINDOWS_MAX_PATH_LENGTH * sizeof(char*) - 1);
-        filePaths[i] = "Hello";
-    }
+    loadFilePaths(fileList, dir);
+    printf("\n\nFINAL PRINT:\n");
+    printFileList(*fileList);   
 
-    getFilePaths(filePaths, count, dir);
-
-    for(int i = 0; i < numFolders; i++)
-    {
-        printf("filePaths[%d]: %s\n", i, filePaths[i]);
-    }
-
-    free(count);
-    free(filePaths);
+    freeFileListFiles(fileList);
+    free(fileList);
     exit(0);
 } 
 
-//Run this first to learn how much memory to allocate for the list
-int listFilesRecursively(const char *basePath)
+void loadFilePaths(FileList* fileList, const char* basePath)
 {
-    char path[1000];
-    struct dirent *dp;
-    DIR *dir = opendir(basePath);
-    int count = 0;
-
-    if (!dir)
-        return 0;
-
-    while ((dp = readdir(dir)) != NULL)
-    {
-        if (strcmp(dp->d_name, ".") != 0 && strcmp(dp->d_name, "..") != 0 && dp->d_type == DT_DIR)
-        {
-            strcpy(path, basePath);
-            strcat(path, "/");
-            strcat(path, dp->d_name);
-            count++;
-            count += listFilesRecursively(path);
-        }
-    }
-
-    closedir(dir);
-    return count;
-}
-
-//Get the names of all subdirectories
-void getFilePaths(char** filePaths, int* count, const char *basePath)
-{
-
-    char* path = (char*)malloc(WINDOWS_MAX_PATH_LENGTH * sizeof(char*) - 1);
+    char* path = (char*)malloc(WINDOWS_MAX_PATH_LENGTH * sizeof(char*));
     struct dirent *dp;
     DIR *dir = opendir(basePath);
     if (!dir)
@@ -79,20 +47,48 @@ void getFilePaths(char** filePaths, int* count, const char *basePath)
 
     while ((dp = readdir(dir)) != NULL)
     {
-
-        if (strcmp(dp->d_name, ".") != 0 && strcmp(dp->d_name, "..") != 0 && dp->d_type == DT_DIR)
+        if (strncmp(dp->d_name, ".", 1) != 0 && dp->d_type == DT_DIR)
         {
             strcpy(path, basePath);
             strcat(path, "/");
             strcat(path, dp->d_name);
 
-            filePaths[(*count)] = path;
+            addFileToList(fileList, path);
 
-            (*count)++;
-            getFilePaths(filePaths, count, path);
+            loadFilePaths(fileList, path);
         }
     }
 
     closedir(dir);
     free(path);
+}
+
+void printFileList(const FileList list)
+{
+    printf("====================================\n");
+    for(int i = 0; i < list.size; i++)
+    {
+        printf("files[%d]: %s\n", i, list.files[i]);
+    }  
+    printf("====================================\n");
+}
+
+void freeFileListFiles(FileList* list)
+{
+    for(int i = 0; i < list->size; i++)
+    {
+        free(list->files[i]);
+    }
+}
+
+void addFileToList(FileList* list, const char* path)
+{
+    int beforeAdditionSize = list->size;
+    int afterAdditionSize = beforeAdditionSize + 1;
+
+    list->files = (char**)realloc(list->files, afterAdditionSize * sizeof(char*));
+    list->files[beforeAdditionSize] = (char*)malloc(WINDOWS_MAX_PATH_LENGTH * sizeof(char*));
+    list->size++;
+
+    strcpy(list->files[beforeAdditionSize], path);
 }
