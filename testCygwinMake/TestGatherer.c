@@ -11,23 +11,28 @@ int main(void)
 { 
     char dir[WINDOWS_MAX_PATH_LENGTH] = ".";
 
-    FileList* tests = (FileList*)malloc(sizeof(FileList*));
+    TestFileList* tests = (TestFileList*)malloc(sizeof(TestFileList));
     tests->size = 0;
     tests->files = (char**)malloc(sizeof(char*));
     tests->files[0] = NULL;
 
-    TestCaseList* testCases;
+    TestCaseList* testCases = (TestCaseList*)malloc(sizeof(TestCaseList));
+    testCases->size = 0;
+    testCases->cases = (TestCase*)malloc(sizeof(TestCase));
+    testCases->cases[0].testFile = NULL;
+    testCases->cases[0].testName = NULL;
 
     loadTests(tests, testCases, dir);
     printf("\n\nFINAL PRINT:\n");
-    printFileList(*tests);   
+    printTestFileList(*tests);
+    printTestCaseList(*testCases);   
 
-    freeFileListFiles(tests);
-    free(tests);
+    freeTestFilesList(tests);
+    freeTestCasesList(testCases);
     exit(0);
 } 
 
-void loadTests(FileList* fileList, TestCaseList* testCases, char* basePath)
+void loadTests(TestFileList* TestFileList, TestCaseList* testCases, char* basePath)
 {
     char* path = (char*)malloc(WINDOWS_MAX_PATH_LENGTH * sizeof(char*));
     struct dirent *dp;
@@ -45,12 +50,12 @@ void loadTests(FileList* fileList, TestCaseList* testCases, char* basePath)
   
         if(isTestDir(basePath) && isTestFile(dp->d_name))
         {
-            addFileToList(fileList, path);
+            addFileToList(TestFileList, path);
             addTestCasesToList(testCases, path);
         }
         if (strncmp(dp->d_name, ".", 1) != 0 && dp->d_type == DT_DIR)
         {
-            loadTests(fileList, testCases, path);
+            loadTests(TestFileList, testCases, path);
         }
     }
 
@@ -58,7 +63,7 @@ void loadTests(FileList* fileList, TestCaseList* testCases, char* basePath)
     free(path);
 }
 
-void printFileList(const FileList list)
+void printTestFileList(const TestFileList list)
 {
     printf("====================================\n");
     for(int i = 0; i < list.size; i++)
@@ -76,15 +81,37 @@ void printFileList(const FileList list)
     printf("====================================\n");
 }
 
-void freeFileListFiles(FileList* list)
+void printTestCaseList(const TestCaseList list)
+{
+    printf("====================================\n");
+    for(int i = 0; i < list.size; i++)
+    {
+        printf("file: %s || testCase: %s\n", list.cases[i].testFile, list.cases[i].testName);
+    }  
+    printf("====================================\n");
+}
+
+void freeTestFilesList(TestFileList* list)
 {
     for(int i = 0; i < list->size; i++)
     {
         free(list->files[i]);
     }
+    free(list);
 }
 
-void addFileToList(FileList* list, const char* path)
+
+void freeTestCasesList(TestCaseList* list)
+{
+    for(int i = 0; i < list->size; i++)
+    {
+        free(list->cases[i].testFile);
+        free(list->cases[i].testName);
+    }
+    free(list);
+}
+
+void addFileToList(TestFileList* list, const char* path)
 {
     int beforeAdditionSize = list->size;
     int afterAdditionSize = beforeAdditionSize + 1;
@@ -98,9 +125,8 @@ void addFileToList(FileList* list, const char* path)
 
 void addTestCasesToList(TestCaseList* list, const char* path)
 {
-    printf("Looking through %s to find test cases\n", path);
     FILE *fp;
-    char buff[255];
+    char* buff = (char*)malloc(255*sizeof(char));
 
     fp = fopen(path, "r");
 
@@ -108,10 +134,19 @@ void addTestCasesToList(TestCaseList* list, const char* path)
     {
         if(isTestCaseDefinition(buff))
         {
-            printf("%s\n", buff );  
+            list->cases = (TestCase*)realloc(list->cases, ((list->size + 1) * sizeof(TestCase)));
+            list->cases[list->size].testName = (char*)malloc(WINDOWS_MAX_PATH_LENGTH * sizeof(char*));
+            list->cases[list->size].testFile = (char*)malloc(WINDOWS_MAX_PATH_LENGTH * sizeof(char*)); 
+
+            trimTestName(buff); 
+
+            strcpy(list->cases[list->size].testName, buff);
+            strcpy(list->cases[list->size].testFile, path);
+            list->size++;
         }  
     }
 
+    free(buff);
     fclose(fp);
 }
 
@@ -206,4 +241,33 @@ bool isTestCaseDefinition(char* line)
         return true;
     }
     return false;
+}
+
+void trimTestName(char* testName)
+{
+    //testName will come in looking like:
+    //  bool testExampleName()
+    //This function will trim of the bool and the brackets
+
+    int count = 0;
+    char* currentPtr = testName;
+    while(*currentPtr != '\0')
+    {
+        count++;   
+        currentPtr++;
+    }
+
+    char temp[count];
+    strcpy(temp, testName);
+
+    for(int i = 0; i < count; i++)
+    {
+        if(i < count - 8)
+        {
+            testName[i] = testName[i+5];
+        }
+        else{
+            testName[i] = '\0';
+        }
+    }
 }
