@@ -16,7 +16,9 @@ int main(void)
     tests->files = (char**)malloc(sizeof(char*));
     tests->files[0] = NULL;
 
-    loadTestFilePaths(tests, dir);
+    TestCaseList* testCases;
+
+    loadTests(tests, testCases, dir);
     printf("\n\nFINAL PRINT:\n");
     printFileList(*tests);   
 
@@ -25,7 +27,7 @@ int main(void)
     exit(0);
 } 
 
-void loadTestFilePaths(FileList* fileList, char* basePath)
+void loadTests(FileList* fileList, TestCaseList* testCases, char* basePath)
 {
     char* path = (char*)malloc(WINDOWS_MAX_PATH_LENGTH * sizeof(char*));
     struct dirent *dp;
@@ -44,10 +46,11 @@ void loadTestFilePaths(FileList* fileList, char* basePath)
         if(isTestDir(basePath) && isTestFile(dp->d_name))
         {
             addFileToList(fileList, path);
+            addTestCasesToList(testCases, path);
         }
         if (strncmp(dp->d_name, ".", 1) != 0 && dp->d_type == DT_DIR)
         {
-            loadTestFilePaths(fileList, path);
+            loadTests(fileList, testCases, path);
         }
     }
 
@@ -91,6 +94,11 @@ void addFileToList(FileList* list, const char* path)
     list->size++;
 
     strcpy(list->files[beforeAdditionSize], path);
+}
+
+void addTestCasesToList(TestCaseList* list, const char* path)
+{
+    printf("Looking through %s to find test cases\n", path);
 }
 
 bool isTestDir(char* dirName)
