@@ -3,12 +3,6 @@
 
 #define WINDOWS_MAX_PATH_LENGTH 260
 
-typedef struct TestFileList
-{
-    int size;
-    char** files;
-} TestFileList;
-
 typedef struct TestCase
 {
     char* testName;
@@ -21,12 +15,9 @@ typedef struct TestCaseList
     TestCase* cases;
 } TestCaseList;
 
-void loadTests(TestFileList* TestFileList, TestCaseList* testCases, char* basePath);
-void printTestFileList(const TestFileList TestFileList);
+void loadTests(TestCaseList* testCases, char* basePath);
 void printTestCaseList(const TestCaseList list);
-void addFileToList(TestFileList* list, const char* path);
 void addTestCasesToList(TestCaseList* list, const char* path);
-void freeTestFilesList(TestFileList* list);
 void freeTestCasesList(TestCaseList* list);
 bool isTestDir(char* dirName);
 bool isTestFile(char* dirName);
@@ -34,5 +25,6 @@ char* lowerString(char* str);
 bool isTestCaseDefinition(char* line);
 void trimTestName(char* testName);
 bool isSpecialCharacter(char c);
+void writeTestsToTestMain(TestCaseList* testCaseList);
 
 #endif

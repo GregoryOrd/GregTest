@@ -11,28 +11,23 @@ int main(void)
 { 
     char dir[WINDOWS_MAX_PATH_LENGTH] = ".";
 
-    TestFileList* tests = (TestFileList*)malloc(sizeof(TestFileList));
-    tests->size = 0;
-    tests->files = (char**)malloc(sizeof(char*));
-    tests->files[0] = NULL;
-
     TestCaseList* testCases = (TestCaseList*)malloc(sizeof(TestCaseList));
     testCases->size = 0;
     testCases->cases = (TestCase*)malloc(sizeof(TestCase));
     testCases->cases[0].testFile = NULL;
     testCases->cases[0].testName = NULL;
 
-    loadTests(tests, testCases, dir);
+    loadTests(testCases, dir);
     printf("\n\nFINAL PRINT:\n");
-    printTestFileList(*tests);
     printTestCaseList(*testCases);   
 
-    freeTestFilesList(tests);
+    writeTestsToTestMain(testCases);
+
     freeTestCasesList(testCases);
     exit(0);
 } 
 
-void loadTests(TestFileList* TestFileList, TestCaseList* testCases, char* basePath)
+void loadTests(TestCaseList* testCases, char* basePath)
 {
     char* path = (char*)malloc(WINDOWS_MAX_PATH_LENGTH * sizeof(char*));
     struct dirent *dp;
@@ -50,35 +45,16 @@ void loadTests(TestFileList* TestFileList, TestCaseList* testCases, char* basePa
   
         if(isTestDir(basePath) && isTestFile(dp->d_name))
         {
-            addFileToList(TestFileList, path);
             addTestCasesToList(testCases, path);
         }
         if (strncmp(dp->d_name, ".", 1) != 0 && dp->d_type == DT_DIR)
         {
-            loadTests(TestFileList, testCases, path);
+            loadTests(testCases, path);
         }
     }
 
     closedir(dir);
     free(path);
-}
-
-void printTestFileList(const TestFileList list)
-{
-    printf("====================================\n");
-    for(int i = 0; i < list.size; i++)
-    {
-        printf("files[%d]: %s - ", i, list.files[i]);
-        if(isTestDir(list.files[i]))
-        {
-            printf("(T)\n");   
-        }
-        else
-        {
-            printf("\n");
-        }   
-    }  
-    printf("====================================\n");
 }
 
 void printTestCaseList(const TestCaseList list)
@@ -91,15 +67,6 @@ void printTestCaseList(const TestCaseList list)
     printf("====================================\n");
 }
 
-void freeTestFilesList(TestFileList* list)
-{
-    for(int i = 0; i < list->size; i++)
-    {
-        free(list->files[i]);
-    }
-    free(list);
-}
-
 
 void freeTestCasesList(TestCaseList* list)
 {
@@ -109,18 +76,6 @@ void freeTestCasesList(TestCaseList* list)
         free(list->cases[i].testName);
     }
     free(list);
-}
-
-void addFileToList(TestFileList* list, const char* path)
-{
-    int beforeAdditionSize = list->size;
-    int afterAdditionSize = beforeAdditionSize + 1;
-
-    list->files = (char**)realloc(list->files, afterAdditionSize * sizeof(char*));
-    list->files[beforeAdditionSize] = (char*)malloc(WINDOWS_MAX_PATH_LENGTH * sizeof(char*));
-    list->size++;
-
-    strcpy(list->files[beforeAdditionSize], path);
 }
 
 void addTestCasesToList(TestCaseList* list, const char* path)
@@ -319,4 +274,104 @@ bool isSpecialCharacter(char c)
         return false;
     }
     return true;
+}
+
+void writeTestsToTestMain(TestCaseList* testCaseList)
+{
+    int numTests = testCaseList->size;
+    int sizeOfTestMainCxx = 220;
+    int sizeOfTestMainH = 45;
+
+    if(numTests >= 1)
+    {
+        sizeOfTestMainCxx += 24;
+    }
+    sizeOfTestMainCxx += (numTests * (67 + WINDOWS_MAX_PATH_LENGTH * sizeof(char*)));
+    sizeOfTestMainH += (numTests * (20 + WINDOWS_MAX_PATH_LENGTH * sizeof(char*)));
+
+    char main[sizeOfTestMainCxx];
+    char mainH[sizeOfTestMainH];
+    main[0] = '\0';
+    mainH[0] = '\0';
+
+    strcat(mainH, "#define DllImport   __declspec(dllimport)\n\n");
+
+    strcat(main, "#include <stdbool.h>\n");
+    strcat(main, "#include <stdio.h>\n");
+    strcat(main, "#include <stdlib.h>\n");
+    strcat(main, "#include \"TestMain.h\"\n\n");
+
+    strcat(main, "int main()\n{\n");
+    strcat(main, "\tbool result = true;\n");
+
+    //
+    //Section for generated code:
+    //For TestMain.cxx
+    //  bool (*testHelloWorldString_fun_ptr_)(void) = &testHelloWorldString;
+    //
+    //For TestMain.h
+    //  DllImport bool testHelloWorldString();
+    //
+    for(int i = 0; i < numTests; i++)
+    {
+        TestCase* cases = testCaseList->cases;
+        char* testName = cases[i].testName;
+        strcat(main, "\tbool (*");
+        strcat(main, testName);
+        strcat(main, "_fun_ptr_)(void) = &");
+        strcat(main, testName);
+        strcat(main, ";\n");
+
+        strcat(mainH, "DllImport bool ");
+        strcat(mainH, testName);
+        strcat(mainH, "();\n");
+    }
+
+    strcat(main, "\n");
+
+    //
+    //Section for generated code:
+    //  result = result && (*testHelloWorldString_fun_ptr_)();
+    //
+    for(int i = 0; i < numTests; i++)
+    {
+        TestCase* cases = testCaseList->cases;
+        char* testName = cases[i].testName;
+        strcat(main, "\tresult = result && (*");
+        strcat(main, testName);
+        strcat(main, "_fun_ptr_)();\n");
+    }
+
+    strcat(main, "\n");
+
+    strcat(main, "\tif(result)\n");
+    strcat(main, "\t{\n");
+    strcat(main, "\t\tprintf(\"All Tests Passed Successfully\");\n");
+    strcat(main, "\t\texit(0);\n");
+    strcat(main, "\t}\n");
+    strcat(main, "\texit(1);\n");
+    strcat(main, "}\n");
+
+    printf("MAIN:\n\n\n");
+    printf("%s", main);
+
+    FILE *fp;
+    fp = fopen("TestMain.c", "w");
+    int writeResult =  fputs(main, fp);
+    if(writeResult == EOF)
+    {
+        printf("Error writing test cases to TestMain.c\n");
+        exit(1);
+    }
+    fclose(fp);
+
+    FILE *fpH;
+    fpH = fopen("TestMain.h", "w");
+    int writeResultH =  fputs(mainH, fpH);
+    if(writeResultH == EOF)
+    {
+        printf("Error writing test cases to TestMain.h\n");
+        exit(1);
+    }
+    fclose(fpH);
 }

@@ -5,14 +5,22 @@
 
 int main()
 {
-    bool (*testHelloWorldString_fun_ptr_)(void) = &testHelloWorldString;
-	bool result = (*testHelloWorldString_fun_ptr_)();
+	bool result = true;
+	bool (*testHelloWorldString_fun_ptr_)(void) = &testHelloWorldString;
+	bool (*testMySt456uff_fun_ptr_)(void) = &testMySt456uff;
 
+	result = result && (*testHelloWorldString_fun_ptr_)();
+	result = result && (*testMySt456uff_fun_ptr_)();
 
 	if(result)
 	{
-		printf("\nAll Tests Passed Successfully\n");
+		printf("All Tests Passed Successfully");
 		exit(0);
 	}
+	else
+	{
+		printf("Tests Failed\n");
+	}
+	
 	exit(1);
 }

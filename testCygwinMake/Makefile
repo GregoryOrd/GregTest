@@ -25,10 +25,10 @@ FRC:
 
 testMain:
 	# Compile to .o files
-	gcc -c src/HelloWorld/testHelloWorld/TestHelloWorld.c src/HelloWorld/HelloWorld.c
+	gcc -c src/HelloWorld/testHelloWorld/TestHelloWorld.c src/HelloWorld/testHelloWorld/TestHelloWorld2.c src/HelloWorld/HelloWorld.c
 
 	# Link .o files together into a dll, then remove .o files
-	gcc -shared -o TestHelloWorld.dll TestHelloWorld.o HelloWorld.o
+	gcc -shared -o TestHelloWorld.dll TestHelloWorld.o TestHelloWorld2.o HelloWorld.o
 	rm *.o
 
 	# Link TestMain to the dll

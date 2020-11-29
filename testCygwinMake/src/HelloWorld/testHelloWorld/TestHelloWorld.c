@@ -8,7 +8,7 @@ bool testHelloWorldString()
 {
 	const char* (*testHelloWorldStringFuncPtr)() = &helloWorldString;
 
-	const char* expected = "Hello World!!!";
+	const char* expected = "Hello World";
 	const char* actual = (*testHelloWorldStringFuncPtr)();
 
 	if(strcmp(expected, actual) == 0)
