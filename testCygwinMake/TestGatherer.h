@@ -13,8 +13,6 @@ typedef struct TestCase
 {
     char* testName;
     char* testFile;
-    char* returnType;
-    char** parameters;
 } TestCase;
 
 typedef struct TestCaseList
@@ -31,5 +29,6 @@ void freeFileListFiles(FileList* list);
 bool isTestDir(char* dirName);
 bool isTestFile(char* dirName);
 char* lowerString(char* str);
+bool isTestCaseDefinition(char* line);
 
 #endif

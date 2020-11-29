@@ -99,6 +99,20 @@ void addFileToList(FileList* list, const char* path)
 void addTestCasesToList(TestCaseList* list, const char* path)
 {
     printf("Looking through %s to find test cases\n", path);
+    FILE *fp;
+    char buff[255];
+
+    fp = fopen(path, "r");
+
+    while(fgets(buff, 255, (FILE*)fp) != NULL)
+    {
+        if(isTestCaseDefinition(buff))
+        {
+            printf("%s\n", buff );  
+        }  
+    }
+
+    fclose(fp);
 }
 
 bool isTestDir(char* dirName)
@@ -143,4 +157,53 @@ char* lowerString(char* str)
         itr++;
     }
     return lower;
+}
+
+bool isTestCaseDefinition(char* line)
+{
+    bool correctStartOfLine = strncmp(line, "bool test", 9) == 0;
+    bool singleSpaceBetweenBoolAndTestName = (strstr(line, " ") == &line[4]);
+
+    int numSpaces = 0;
+    int numLeftBrackets = 0;
+    int numRightBrackets = 0;
+    bool hasSpecialCharacters = false;
+    int leftBracketIndex = 0;
+    int rightBracketIndex = 0;
+
+    int length = 0;
+    char* currentPtr = line;
+    while(*currentPtr != '\0')
+    {
+        if(*currentPtr == ' ')
+        {
+            numSpaces++;
+        }
+        else if(*currentPtr == '(')
+        {
+            numLeftBrackets++;
+            leftBracketIndex = length;
+        }
+        else if(*currentPtr == ')')
+        {
+            numRightBrackets++;
+            rightBracketIndex = length;
+        }
+        else if(!(*currentPtr >= 'A' && *currentPtr <= 'Z') && !(*currentPtr >= 'a' && *currentPtr <= 'z'))
+        {
+            hasSpecialCharacters = true;
+        }
+        length++;
+        currentPtr++;
+    }
+
+
+    bool correctSpaces = singleSpaceBetweenBoolAndTestName && numSpaces == 1;
+    bool correctBrackets = numLeftBrackets == 1 && numRightBrackets == 1 && leftBracketIndex == length-3 && rightBracketIndex == length - 2;
+
+    if(correctStartOfLine && correctSpaces && correctBrackets)
+    {
+        return true;
+    }
+    return false;
 }
