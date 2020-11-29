@@ -13,6 +13,8 @@ typedef struct TestCase
 {
     char* testName;
     char* testFile;
+    char* returnType;
+    char** parameters;
 } TestCase;
 
 typedef struct TestCaseList
