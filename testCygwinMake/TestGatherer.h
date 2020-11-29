@@ -8,7 +8,7 @@ typedef struct FileList{
     char** files;
 } FileList;
 
-void loadFilePaths(FileList* fileList, const char* basePath);
+void loadTestFilePaths(FileList* fileList, char* basePath);
 void printFileList(const FileList fileList);
 void addFileToList(FileList* list, const char* path);
 void freeFileListFiles(FileList* list);

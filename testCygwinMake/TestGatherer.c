@@ -9,23 +9,23 @@
 
 int main(void) 
 { 
-    const char dir[WINDOWS_MAX_PATH_LENGTH] = ".";
+    char dir[WINDOWS_MAX_PATH_LENGTH] = ".";
 
-    FileList* fileList = (FileList*)malloc(sizeof(FileList*));
-    fileList->size = 0;
-    fileList->files = (char**)malloc(sizeof(char*));
-    fileList->files[0] = NULL;
+    FileList* tests = (FileList*)malloc(sizeof(FileList*));
+    tests->size = 0;
+    tests->files = (char**)malloc(sizeof(char*));
+    tests->files[0] = NULL;
 
-    loadFilePaths(fileList, dir);
+    loadTestFilePaths(tests, dir);
     printf("\n\nFINAL PRINT:\n");
-    printFileList(*fileList);   
+    printFileList(*tests);   
 
-    freeFileListFiles(fileList);
-    free(fileList);
+    freeFileListFiles(tests);
+    free(tests);
     exit(0);
 } 
 
-void loadFilePaths(FileList* fileList, const char* basePath)
+void loadTestFilePaths(FileList* fileList, char* basePath)
 {
     char* path = (char*)malloc(WINDOWS_MAX_PATH_LENGTH * sizeof(char*));
     struct dirent *dp;
@@ -37,15 +37,17 @@ void loadFilePaths(FileList* fileList, const char* basePath)
 
     while ((dp = readdir(dir)) != NULL)
     {
+        strcpy(path, basePath);
+        strcat(path, "/");
+        strcat(path, dp->d_name);
+  
+        if(isTestDir(basePath) && isTestFile(dp->d_name))
+        {
+            addFileToList(fileList, path);
+        }
         if (strncmp(dp->d_name, ".", 1) != 0 && dp->d_type == DT_DIR)
         {
-            strcpy(path, basePath);
-            strcat(path, "/");
-            strcat(path, dp->d_name);
-  
-            addFileToList(fileList, path);
-
-            loadFilePaths(fileList, path);
+            loadTestFilePaths(fileList, path);
         }
     }
 
