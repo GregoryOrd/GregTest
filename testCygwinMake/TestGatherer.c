@@ -3,18 +3,8 @@
 #include <string.h>
 #include <stdbool.h>
 #include <stdlib.h>
-
-#define WINDOWS_MAX_PATH_LENGTH 260
-
-typedef struct FileList{
-    int size;
-    char** files;
-} FileList;
-
-void loadFilePaths(FileList* fileList, const char* basePath);
-void printFileList(const FileList fileList);
-void addFileToList(FileList* list, const char* path);
-void freeFileListFiles(FileList* list);
+#include <ctype.h>
+#include "TestGatherer.h"
 
 
 int main(void) 
@@ -52,7 +42,7 @@ void loadFilePaths(FileList* fileList, const char* basePath)
             strcpy(path, basePath);
             strcat(path, "/");
             strcat(path, dp->d_name);
-
+  
             addFileToList(fileList, path);
 
             loadFilePaths(fileList, path);
@@ -68,7 +58,15 @@ void printFileList(const FileList list)
     printf("====================================\n");
     for(int i = 0; i < list.size; i++)
     {
-        printf("files[%d]: %s\n", i, list.files[i]);
+        printf("files[%d]: %s - ", i, list.files[i]);
+        if(isTestDir(list.files[i]))
+        {
+            printf("(T)\n");   
+        }
+        else
+        {
+            printf("\n");
+        }   
     }  
     printf("====================================\n");
 }
@@ -91,4 +89,48 @@ void addFileToList(FileList* list, const char* path)
     list->size++;
 
     strcpy(list->files[beforeAdditionSize], path);
+}
+
+bool isTestDir(char* dirName)
+{
+    bool result = false;
+    char* lower = lowerString(dirName);
+    if(strstr(lower, "/test") != NULL)
+    {
+        result = true;
+    }
+    free(lower);
+    return result;
+}
+
+bool isTestFile(char* dirName)
+{
+    bool result = false;
+    char* lower = lowerString(dirName);
+    if(strncmp(lower, "test", 4) == 0 && (strstr(lower, ".c") != NULL || strstr(lower, ".cpp") != NULL))
+    {
+        result = true;
+    }
+    free(lower);
+    return result;
+}
+
+char* lowerString(char* str)
+{
+    int size = 0;
+
+    char* lower = (char*)malloc(sizeof(char));
+    lower[0] = '\0';
+
+    char* itr = str;
+    while(*itr != '\0')
+    {
+        char l = tolower(*itr);
+        lower = (char*)realloc(lower, size+2);
+        lower[size] = l;
+        lower[size+1] = '\0';
+        size++;
+        itr++;
+    }
+    return lower;
 }
