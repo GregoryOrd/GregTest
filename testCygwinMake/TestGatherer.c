@@ -224,21 +224,45 @@ bool isTestCaseDefinition(char* line)
             numRightBrackets++;
             rightBracketIndex = length;
         }
-        else if(!(*currentPtr >= 'A' && *currentPtr <= 'Z') && !(*currentPtr >= 'a' && *currentPtr <= 'z'))
-        {
-            hasSpecialCharacters = true;
-        }
         length++;
         currentPtr++;
     }
 
 
     bool correctSpaces = singleSpaceBetweenBoolAndTestName && numSpaces == 1;
-    bool correctBrackets = numLeftBrackets == 1 && numRightBrackets == 1 && leftBracketIndex == length-3 && rightBracketIndex == length - 2;
+
+    int expectedLeftBracketIndex = length - 3;
+    if(line[length-2] == '{')
+    {
+        expectedLeftBracketIndex--;
+    }
+    int expectedRightBracketIndex = expectedLeftBracketIndex + 1; 
+
+    bool correctBracketCount = numLeftBrackets == 1 && numRightBrackets == 1; 
+    bool correctBracketPosition = leftBracketIndex == expectedLeftBracketIndex && rightBracketIndex == expectedRightBracketIndex;
+    bool correctBrackets = correctBracketCount && correctBracketPosition;
 
     if(correctStartOfLine && correctSpaces && correctBrackets)
     {
-        return true;
+        for(int i = 0; i < length; i++)
+        {
+            if(isSpecialCharacter(line[i]))
+            {
+                hasSpecialCharacters = true;
+            }
+        }
+
+        if(!hasSpecialCharacters)
+        {
+            return true;
+        }
+        else
+        {
+            printf("\nGregTest does not accept test cases with special characters in the name of the test.\n");
+            printf("%s\n\n", line);
+            return false;
+        }
+        
     }
     return false;
 }
@@ -248,6 +272,8 @@ void trimTestName(char* testName)
     //testName will come in looking like:
     //  bool testExampleName()
     //This function will trim of the bool and the brackets
+    int offset = 8;
+
 
     int count = 0;
     char* currentPtr = testName;
@@ -257,12 +283,17 @@ void trimTestName(char* testName)
         currentPtr++;
     }
 
+    if(testName[count-2] == '{')
+    {
+        offset++;
+    }
+
     char temp[count];
     strcpy(temp, testName);
 
     for(int i = 0; i < count; i++)
     {
-        if(i < count - 8)
+        if(i < count - offset)
         {
             testName[i] = testName[i+5];
         }
@@ -270,4 +301,22 @@ void trimTestName(char* testName)
             testName[i] = '\0';
         }
     }
+}
+
+bool isSpecialCharacter(char c)
+{
+    bool isCarriageReturn = c == 13;
+    bool isNewLine = c == '\n';
+    bool isNumber = c >= '0' && c <= '9';
+    bool isUpperCaseLetter = c >= 'A' && c <= 'Z';
+    bool isLowerCaseLetter = c >= 'a' && c <= 'z';
+    bool isSpace = c == ' ';
+    bool isLeftCurrlyBracket = c == '{';
+    bool isParenthesis = (c == '(') || (c == ')');
+
+    if(isCarriageReturn || isNewLine || isNumber || isUpperCaseLetter || isLowerCaseLetter || isSpace || isLeftCurrlyBracket || isParenthesis)
+    {
+        return false;
+    }
+    return true;
 }

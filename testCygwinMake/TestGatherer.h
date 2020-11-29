@@ -33,5 +33,6 @@ bool isTestFile(char* dirName);
 char* lowerString(char* str);
 bool isTestCaseDefinition(char* line);
 void trimTestName(char* testName);
+bool isSpecialCharacter(char c);
 
 #endif
