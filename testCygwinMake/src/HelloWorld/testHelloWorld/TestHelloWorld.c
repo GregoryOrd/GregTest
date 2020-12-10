@@ -3,6 +3,7 @@
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include "../../../GregTest.h"
 
 bool testHelloWorldString()
 {
@@ -11,14 +12,5 @@ bool testHelloWorldString()
 	const char* expected = "Hello World";
 	const char* actual = (*testHelloWorldStringFuncPtr)();
 
-	if(strcmp(expected, actual) == 0)
-	{
-		printf("[PASS]: testHelloWorldString\n");
-		return true;
-	}
-	else
-	{
-		printf("[FAIL]: testHelloWorldString\n[Expected]: %s\n[Actual]: %s\n\n", expected, actual);
-		return false;
-	}
+	return G_ASSERT_STR_EQ(expected, actual);
 }
