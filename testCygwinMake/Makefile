@@ -13,7 +13,7 @@
 # 	$(CC)$(CCFLAGS) -c -o $@ $<
 
 clean: FRC
-	rm TestHelloWorld.dll TestMain.exe
+	rm *.o *.dll *.exe
 
 FRC:
 
