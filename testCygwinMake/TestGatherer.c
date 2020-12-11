@@ -18,8 +18,6 @@ int main(void)
     testCases->cases[0].testName = NULL;
 
     loadTests(testCases, dir);
-    printf("\n\nFINAL PRINT:\n");
-    printTestCaseList(*testCases);   
 
     writeTestsToTestMain(testCases);
 
@@ -56,17 +54,6 @@ void loadTests(TestCaseList* testCases, char* basePath)
     closedir(dir);
     free(path);
 }
-
-void printTestCaseList(const TestCaseList list)
-{
-    printf("====================================\n");
-    for(int i = 0; i < list.size; i++)
-    {
-        printf("file: %s || testCase: %s\n", list.cases[i].testFile, list.cases[i].testName);
-    }  
-    printf("====================================\n");
-}
-
 
 void freeTestCasesList(TestCaseList* list)
 {
@@ -151,7 +138,7 @@ char* lowerString(char* str)
 
 bool isTestCaseDefinition(char* line)
 {
-    bool correctStartOfLine = strncmp(line, "bool test", 9) == 0;
+    bool correctStartOfLine = strncmp(line, "void test", 9) == 0;
     bool singleSpaceBetweenBoolAndTestName = (strstr(line, " ") == &line[4]);
 
     int numSpaces = 0;
@@ -225,8 +212,8 @@ bool isTestCaseDefinition(char* line)
 void trimTestName(char* testName)
 {
     //testName will come in looking like:
-    //  bool testExampleName()
-    //This function will trim of the bool and the brackets
+    //  void testExampleName()
+    //This function will trim of the void and the brackets
     int offset = 8;
 
 
@@ -279,99 +266,146 @@ bool isSpecialCharacter(char c)
 void writeTestsToTestMain(TestCaseList* testCaseList)
 {
     int numTests = testCaseList->size;
-    int sizeOfTestMainCxx = 220;
-    int sizeOfTestMainH = 45;
+    TestCase* cases = testCaseList->cases;
+    writeToTestMainC(numTests, cases);
+    writeToTestMainH(numTests, cases);
+}
 
-    if(numTests >= 1)
-    {
-        sizeOfTestMainCxx += 24;
-    }
-    sizeOfTestMainCxx += (numTests * (67 + WINDOWS_MAX_PATH_LENGTH * sizeof(char*)));
-    sizeOfTestMainH += (numTests * (20 + WINDOWS_MAX_PATH_LENGTH * sizeof(char*)));
+void writeToTestMainC(int numTests, TestCase* cases)
+{
+    int size = sizeOfTestMainC(numTests);
+    char contents[size];
+    contents[0] = '\0';
+    populateTestMainCContents(contents, numTests, cases);
+    writeToFile("TestMain.c", contents);
+}
 
-    char main[sizeOfTestMainCxx];
-    char mainH[sizeOfTestMainH];
-    main[0] = '\0';
-    mainH[0] = '\0';
+void populateTestMainCContents(char* contents, int numTests, TestCase* cases)
+{
+    addTestMainCIncludes(contents);
+    strcat(contents, "int main()\n{\n");
+    addTestMainCFunctionPointerDefinitions(contents, numTests, cases);
+    addTestMainCFunctionPointerCalls(contents, numTests, cases);
+    addTestMainCResultsCheckAndExits(contents);
+}
 
-    strcat(mainH, "#define DllImport   __declspec(dllimport)\n\n");
-
+void addTestMainCIncludes(char* main)
+{
     strcat(main, "#include <stdbool.h>\n");
     strcat(main, "#include <stdio.h>\n");
     strcat(main, "#include <stdlib.h>\n");
     strcat(main, "#include \"TestMain.h\"\n\n");
+}
 
-    strcat(main, "int main()\n{\n");
-    strcat(main, "\tbool result = true;\n");
-
-    //
-    //Section for generated code:
-    //For TestMain.cxx
-    //  bool (*testHelloWorldString_fun_ptr_)(void) = &testHelloWorldString;
-    //
-    //For TestMain.h
-    //  DllImport bool testHelloWorldString();
-    //
+void addTestMainCFunctionPointerDefinitions(char* main, int numTests, TestCase* cases)
+{
     for(int i = 0; i < numTests; i++)
     {
-        TestCase* cases = testCaseList->cases;
         char* testName = cases[i].testName;
-        strcat(main, "\tbool (*");
+        strcat(main, "\tvoid (*");
         strcat(main, testName);
         strcat(main, "_fun_ptr_)(void) = &");
         strcat(main, testName);
         strcat(main, ";\n");
-
-        strcat(mainH, "DllImport bool ");
-        strcat(mainH, testName);
-        strcat(mainH, "();\n");
     }
-
     strcat(main, "\n");
+}
 
-    //
-    //Section for generated code:
-    //  result = result && (*testHelloWorldString_fun_ptr_)();
-    //
+void addTestMainCFunctionPointerCalls(char* main, int numTests, TestCase* cases)
+{
     for(int i = 0; i < numTests; i++)
     {
-        TestCase* cases = testCaseList->cases;
         char* testName = cases[i].testName;
-        strcat(main, "\tresult = result && (*");
+        strcat(main, "\t(*");
         strcat(main, testName);
         strcat(main, "_fun_ptr_)();\n");
     }
-
     strcat(main, "\n");
+}
 
-    strcat(main, "\tif(result)\n");
+void addTestMainCResultsCheckAndExits(char* main)
+{
+    strcat(main, "\tif(result())\n");
     strcat(main, "\t{\n");
     strcat(main, "\t\tprintf(\"All Tests Passed Successfully\");\n");
     strcat(main, "\t\texit(0);\n");
     strcat(main, "\t}\n");
+    strcat(main, "\telse\n");
+    strcat(main, "\t{\n");
+    strcat(main, "\t\tprintf(\"Tests Failed\");\n");
+    strcat(main, "\t}\n");
     strcat(main, "\texit(1);\n");
     strcat(main, "}\n");
+}
 
-    printf("MAIN:\n\n\n");
-    printf("%s", main);
+void writeToTestMainH(int numTests, TestCase* cases)
+{
+    int size = sizeOfTestMainH(numTests);
+    char contents[size];
+    contents[0] = '\0';
+    writeTestMainHGuardsAndDllDefine(contents);
+    writeTestMainHGregTestDllImports(contents);
+    writeTestMainHTestCaseDllImports(contents, numTests, cases);
+    writeTestMainHEnd(contents);
+    writeToFile("TestMain.h", contents);
+}
 
-    FILE *fp;
-    fp = fopen("TestMain.c", "w");
-    int writeResult =  fputs(main, fp);
+void writeTestMainHGuardsAndDllDefine(char* contents)
+{
+    strcat(contents, "#ifndef TEST_MAIN_H\n");
+    strcat(contents, "#define TEST_MAIN_H\n\n");
+    strcat(contents, "#define DllImport   __declspec(dllimport)\n\n");
+}
+
+void writeTestMainHGregTestDllImports(char* contents)
+{
+    strcat(contents, "//For GregTest\n");
+    strcat(contents, "DllImport bool result();\n\n");
+}
+
+void writeTestMainHTestCaseDllImports(char* contents, int numTests, TestCase* cases)
+{
+    strcat(contents, "//From Tests Written Throughout the Repo\n");
+    for(int i = 0; i < numTests; i++)
+    {
+        char* testName = cases[i].testName;
+
+        strcat(contents, "DllImport void ");
+        strcat(contents, testName);
+        strcat(contents, "();\n");
+    }
+}
+
+void writeTestMainHEnd(char* contents)
+{
+    strcat(contents, "\n#endif\n");
+}
+
+int sizeOfTestMainC(int numTests)
+{
+    int size = TEST_MAIN_C_BASE_SIZE;
+    size += (numTests * (TEST_MAIN_C_SIZE_INCREMENT_PER_TESTCASE + WINDOWS_MAX_PATH_LENGTH * sizeof(char*)));
+    printf("SIZE of TestMain.c: %d\n", size);
+    return size;
+}
+
+int sizeOfTestMainH(int numTests)
+{
+    int size = TEST_MAIN_C_BASE_SIZE;
+    size += (numTests * (TEST_MAIN_H_SIZE_INCREMENT_PER_TESTCASE + WINDOWS_MAX_PATH_LENGTH * sizeof(char*)));
+    printf("SIZE of TestMain.h: %d\n", size);
+    return size;
+}
+
+void writeToFile(const char* filename, const char* contents)
+{
+    FILE *file;
+    file = fopen(filename, "w");
+    int writeResult =  fputs(contents, file);
     if(writeResult == EOF)
     {
-        printf("Error writing test cases to TestMain.c\n");
+        printf("Error writing test cases to %s\n", filename);
         exit(1);
     }
-    fclose(fp);
-
-    FILE *fpH;
-    fpH = fopen("TestMain.h", "w");
-    int writeResultH =  fputs(mainH, fpH);
-    if(writeResultH == EOF)
-    {
-        printf("Error writing test cases to TestMain.h\n");
-        exit(1);
-    }
-    fclose(fpH);
+    fclose(file);
 }

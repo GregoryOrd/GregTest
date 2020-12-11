@@ -1,9 +1,9 @@
 #ifndef TEST_MAIN_H
 #define TEST_MAIN_H
 
-#define DllImport   __declspec(dllimport)
+#define DllImport __declspec(dllimport)
 
-//For GregTest
+//From GregTest
 DllImport bool result();
 
 //From Tests Written Throughout the Repo
