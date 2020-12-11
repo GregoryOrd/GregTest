@@ -1,0 +1,7 @@
+TODO
+-----
+1) Change Test Gatherer to see void instead of bool as a test case
+2) Change Test Gatherer to Write To TestMain.c and TestMain.h Appropriately
+3) Build TestGatherer into GregTest.dll
+4) Start tracking time for each test case, total time for all tests
+5) Add timeout for test cases -> fail if exceeded

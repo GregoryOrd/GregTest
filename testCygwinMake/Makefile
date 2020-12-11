@@ -22,14 +22,21 @@ FRC:
 # Step 2) Tell gcc it is building a shared library: gcc - shared -o HelloWorld.dll HelloWorld.o
 # Step 3) Link to the dll with: gcc -o TestMain TestMain.c -L./ -lHelloWorld.dll
 
+GregTest:
+	# Compile to .o files
+	gcc -c GregTest.c
 
-testMain:
+	# Link into a dll, then remove .o files
+	gcc -shared -o GregTest.dll GregTest.o
+	rm *.o
+
+testMain: GregTest.dll
 	# Compile to .o files
 	gcc -c src/HelloWorld/testHelloWorld/TestHelloWorld.c src/HelloWorld/testHelloWorld/TestHelloWorld2.c src/HelloWorld/HelloWorld.c
 
 	# Link .o files together into a dll, then remove .o files
-	gcc -shared -o TestHelloWorld.dll TestHelloWorld.o TestHelloWorld2.o HelloWorld.o
+	gcc -shared -o TestHelloWorld.dll TestHelloWorld.o TestHelloWorld2.o HelloWorld.o -L./ GregTest.dll
 	rm *.o
 
 	# Link TestMain to the dll
-	gcc -o TestMain TestMain.c -L./ TestHelloWorld.dll
+	gcc -o TestMain TestMain.c -L./ TestHelloWorld.dll GregTest.dll
