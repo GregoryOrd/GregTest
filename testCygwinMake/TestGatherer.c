@@ -354,7 +354,7 @@ void writeTestMainHGuardsAndDllDefine(char* contents)
 {
     strcat(contents, "#ifndef TEST_MAIN_H\n");
     strcat(contents, "#define TEST_MAIN_H\n\n");
-    strcat(contents, "#define DllImport   __declspec(dllimport)\n\n");
+    strcat(contents, "#define DllImport __declspec(dllimport)\n\n");
 }
 
 void writeTestMainHGregTestDllImports(char* contents)
