@@ -3,10 +3,8 @@
 
 void testHelloWorldString()
 {
-	const char* (*testHelloWorldStringFuncPtr)() = &helloWorldString;
-
 	const char* expected = "Hello World";
-	const char* actual = (*testHelloWorldStringFuncPtr)();
+	const char* actual = helloWorldString();
 
 	G_ASSERT_STR_EQ(expected, actual);
 }
