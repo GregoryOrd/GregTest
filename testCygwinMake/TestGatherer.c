@@ -14,10 +14,7 @@ int main(void)
     char dir[WINDOWS_MAX_PATH_LENGTH] = ".";
 
     TestCaseList* testCases = (TestCaseList*)malloc(sizeof(TestCaseList));
-    testCases->size = 0;
-    testCases->cases = (TestCase*)malloc(sizeof(TestCase));
-    testCases->cases[0].testFile = NULL;
-    testCases->cases[0].testName = NULL;
+    initTestCases(testCases);
 
     loadTests(testCases, dir);
 
@@ -26,6 +23,14 @@ int main(void)
     freeTestCasesList(testCases);
     exit(0);
 } 
+
+void initTestCases(TestCaseList* testCases)
+{
+    testCases->size = 0;
+    testCases->cases = (TestCase*)malloc(sizeof(TestCase));
+    testCases->cases[0].testFile = NULL;
+    testCases->cases[0].testName = NULL; 
+}
 
 void loadTests(TestCaseList* testCases, char* basePath)
 {
