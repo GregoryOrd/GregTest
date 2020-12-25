@@ -1,15 +1,13 @@
 TODO
 -----
-1) Refactor isTestCaseDefinition function in TestGatherer.c
-	1a) Consider creating a "LineMetrics" struct to hold all of the details such as line length,
-		number of left brackets, number of right brackets, ect
-2) Build TestGatherer into GregTest.dll
-3) Have TestGatherer write into the make file
-4) Create a SourceFileGatherer that gather source files and writes them into the makefiles automatically
+1) Refactor TestGatherer
+	1a) Split out TestFileDefinitions.h/.c and TestCaseDefinitions.h.c
+2) Have TestGatherer write into the make file
+3) Create a SourceFileGatherer that gather source files and writes them into the makefiles automatically
  so that they don't need to be put in there to compile everytime a new src file is added
-5) Start tracking time for each test case, total time for all tests
-6) Add timeout for test cases -> fail if exceeded
-7) Make test file and test case definitions resource configurable.
+4) Start tracking time for each test case, total time for all tests
+5) Add timeout for test cases -> fail if exceeded
+6) Make test file and test case definitions resource configurable.
 	- Perhaps we could define these rules in an XML file, then write an XML parser to read them at runtime
 	- See the structs in TestGatherer.h for determining what variable constitute these rules
 	- The has special characters definition could also be a rule in this XML
