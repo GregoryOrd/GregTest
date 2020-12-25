@@ -1,7 +1,7 @@
 #ifndef TEST_MAIN_H
 #define TEST_MAIN_H
 
-#define DllImport   __declspec(dllimport)
+#define DllImport __declspec(dllimport)
 
 //For GregTest
 DllImport bool result();

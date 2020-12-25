@@ -30,6 +30,9 @@ GregTest:
 	gcc -shared -o GregTest.dll GregTest.o
 	rm *.o
 
+testGatherer:
+	gcc TestGatherer.c TestMainWriter.c -o TestGathererAndWriter.exe
+
 testMain: GregTest.dll
 	# Compile to .o files
 	gcc -c src/HelloWorld/testHelloWorld/TestHelloWorld.c src/HelloWorld/testHelloWorld/TestHelloWorld2.c src/HelloWorld/HelloWorld.c
