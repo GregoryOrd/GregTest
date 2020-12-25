@@ -220,37 +220,34 @@ bool isTestCaseDefinition(char* line)
 void trimTestName(char* testName)
 {
     //testName will come in looking like:
-    //  void testExampleName()
+    //void testExampleName()
     //This function will trim of the void and the brackets
-    int offset = 8;
-
-
-    int count = 0;
-    char* currentPtr = testName;
-    while(*currentPtr != '\0' && *currentPtr != '\n')
+    int length = strlen(testName) - 1;
+    int endOffset = testNameEndOffset(testName);
+    for(int i = 0; i < strlen(testName) - 1; i++)
     {
-        count++;   
-        currentPtr++;
-    }
-
-    if(testName[count-2] == '{')
-    {
-        offset++;
-    }
-
-    char temp[count];
-    strcpy(temp, testName);
-
-    for(int i = 0; i < count; i++)
-    {
-        if(i < count - offset)
+        if(i < length - endOffset )
         {
-            testName[i] = testName[i+5];
+            testName[i] = testName[i + TEST_NAME_TRIM_FRONT_OFFSET];
         }
         else{
             testName[i] = '\0';
         }
     }
+}
+
+int testNameEndOffset(char* testName)
+{
+    if(theCurlyBraceIsOnTheSameLineAsTheTestName(testName, strlen(testName) - 1))
+    {
+        return TEST_NAME_TRIM_BACK_OFFSET_CURLY_BRACE_SAME_LINE;
+    }
+    return TEST_NAME_TRIM_BACK_OFFSET_CURLY_BRACE_NEXT_LINE;
+}
+
+bool theCurlyBraceIsOnTheSameLineAsTheTestName(char* testName, int initialLength)
+{
+    return testName[initialLength-2] == '{';
 }
 
 bool isSpecialCharacter(char c)

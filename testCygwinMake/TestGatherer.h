@@ -18,6 +18,8 @@ bool isTestFile(struct dirent *fileOrSubDirectory);
 void lowerString(char* dest, char* src);
 bool isTestCaseDefinition(char* line);
 void trimTestName(char* testName);
+int testNameEndOffset(char* testName);
+bool theCurlyBraceIsOnTheSameLineAsTheTestName(char* testName, int initialLength);
 bool isSpecialCharacter(char c);
 
 #endif
