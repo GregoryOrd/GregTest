@@ -1,5 +1,5 @@
-#ifndef TESTSTRUCTURES_H
-#define TESTSTRUCTURES_H
+#ifndef TESTSTRUCTUREDEFS_H
+#define TESTSTRUCTUREDEFS_H
 
 #include <dirent.h>
 #include <stdio.h>

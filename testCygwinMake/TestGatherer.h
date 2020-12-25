@@ -2,7 +2,7 @@
 #define TESTGATHERER_H
 
 #include <stdbool.h>
-#include "TestStructures.h"
+#include "TestStructureDefs.h"
 
 void initTestCases(TestCaseList* testCases);
 void loadTests(TestCaseList* testCases, char* basePath);
