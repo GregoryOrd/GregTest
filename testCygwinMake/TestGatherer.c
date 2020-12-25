@@ -33,7 +33,7 @@ void initTestCases(TestCaseList* testCases)
 
 void loadTests(TestCaseList* testCases, char* basePath)
 {
-    char* path = (char*)malloc(WINDOWS_MAX_PATH_LENGTH * sizeof(char*));
+    char* fileOrSubDirectoryFullPath = (char*)malloc(WINDOWS_MAX_PATH_LENGTH * sizeof(char*));
     struct dirent *fileOrSubDirectory;
 
     DIR *basePathDirectory = opendir(basePath);
@@ -44,20 +44,24 @@ void loadTests(TestCaseList* testCases, char* basePath)
 
     while ((fileOrSubDirectory = readdir(basePathDirectory)) != NULL)
     {
-        copyFileOrSubDirectoryNameIntoPath(path, basePath, fileOrSubDirectory->d_name);
-  
-        if(isTestDir(basePath) && isTestFile(fileOrSubDirectory))
-        {
-            addTestCasesToList(testCases, path);
-        }
-        if (isDirectory(fileOrSubDirectory))
-        {
-            loadTests(testCases, path);
-        }
+        copyFileOrSubDirectoryNameIntoPath(fileOrSubDirectoryFullPath, basePath, fileOrSubDirectory->d_name);
+        addTestCasesOrEnterSubDirectoryForRecursion(testCases, basePath, fileOrSubDirectory, fileOrSubDirectoryFullPath);
     }
 
     closedir(basePathDirectory);
-    free(path);
+    free(fileOrSubDirectoryFullPath);
+}
+
+void addTestCasesOrEnterSubDirectoryForRecursion(TestCaseList* testCases, char* basePath, struct dirent *fileOrSubDirectory, char* fileOrSubDirectoryFullPath)
+{
+    if(isTestDir(basePath) && isTestFile(fileOrSubDirectory))
+    {
+        addTestCasesToList(testCases, fileOrSubDirectoryFullPath);
+    }
+    if (isDirectory(fileOrSubDirectory))
+    {
+        loadTests(testCases, fileOrSubDirectoryFullPath);
+    }
 }
 
 bool isDirectory(struct dirent *fileOrSubDirectory)
@@ -97,7 +101,7 @@ void addTestCasesToList(TestCaseList* list, const char* pathToTestFile)
     }
 
     free(buffer);
-    fclose(pathToTestFile);
+    fclose(testFile);
 }
 
 void addSingleTestCaseToList(TestCaseList* list, const char* pathToTestFile, char* buffer)

@@ -6,6 +6,7 @@
 
 void initTestCases(TestCaseList* testCases);
 void loadTests(TestCaseList* testCases, char* basePath);
+void addTestCasesOrEnterSubDirectoryForRecursion(TestCaseList* testCases, char* basePath, struct dirent *fileOrSubDirectory, char* fileOrSubDirectoryFullPath);
 bool isDirectory(struct dirent *fileOrSubDirectory);
 void copyFileOrSubDirectoryNameIntoPath(char* path, char* basePath, char* fileOrSubDirectoryName);
 void printTestCaseList(const TestCaseList list);
