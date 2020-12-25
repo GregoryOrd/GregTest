@@ -5,6 +5,12 @@
 
 int main(void) 
 { 
+    #if defined(_WIN32) || defined(_WIN64)
+        printf("TestGatherer does not support being built on Windows.\n");
+        printf("If you have a Windows machine, please use Cygwin.\n");
+        exit(1);
+    #endif
+    
     char dir[WINDOWS_MAX_PATH_LENGTH] = ".";
 
     TestCaseList* testCases = (TestCaseList*)malloc(sizeof(TestCaseList));
