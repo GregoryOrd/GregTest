@@ -82,31 +82,35 @@ void freeTestCasesList(TestCaseList* list)
     free(list);
 }
 
-void addTestCasesToList(TestCaseList* list, const char* path)
+void addTestCasesToList(TestCaseList* list, const char* pathToTestFile)
 {
-    FILE *fp;
-    char* buff = (char*)malloc(255*sizeof(char));
+    FILE *testFile;
+    char* buffer = (char*)malloc(255*sizeof(char));
+    testFile = fopen(pathToTestFile, "r");
 
-    fp = fopen(path, "r");
-
-    while(fgets(buff, 255, (FILE*)fp) != NULL)
+    while(fgets(buffer, 255, (FILE*)testFile) != NULL)
     {
-        if(isTestCaseDefinition(buff))
+        if(isTestCaseDefinition(buffer))
         {
-            list->cases = (TestCase*)realloc(list->cases, ((list->size + 1) * sizeof(TestCase)));
-            list->cases[list->size].testName = (char*)malloc(WINDOWS_MAX_PATH_LENGTH * sizeof(char*));
-            list->cases[list->size].testFile = (char*)malloc(WINDOWS_MAX_PATH_LENGTH * sizeof(char*)); 
-
-            trimTestName(buff); 
-
-            strcpy(list->cases[list->size].testName, buff);
-            strcpy(list->cases[list->size].testFile, path);
-            list->size++;
+            addSingleTestCaseToList(list, pathToTestFile, buffer);
         }  
     }
 
-    free(buff);
-    fclose(fp);
+    free(buffer);
+    fclose(pathToTestFile);
+}
+
+void addSingleTestCaseToList(TestCaseList* list, const char* pathToTestFile, char* buffer)
+{
+    list->cases = (TestCase*)realloc(list->cases, ((list->size + 1) * sizeof(TestCase)));
+    list->cases[list->size].testName = (char*)malloc(WINDOWS_MAX_PATH_LENGTH * sizeof(char*));
+    list->cases[list->size].testFile = (char*)malloc(WINDOWS_MAX_PATH_LENGTH * sizeof(char*)); 
+
+    trimTestName(buffer); 
+
+    strcpy(list->cases[list->size].testName, buffer);
+    strcpy(list->cases[list->size].testFile, pathToTestFile);
+    list->size++;
 }
 
 bool isTestDir(char* dirName)
