@@ -7,8 +7,8 @@
     #include <dirent.h>
 #endif
 
-#include <stdlib.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 
 #define WINDOWS_MAX_PATH_LENGTH 260

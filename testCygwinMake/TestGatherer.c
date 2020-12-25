@@ -25,6 +25,11 @@ void loadTests(TestCaseList* testCases, char* basePath)
 {
     char* path = (char*)malloc(WINDOWS_MAX_PATH_LENGTH * sizeof(char*));
     struct dirent *dp;
+    #if defined(_WIN32) || defined(_WIN64)
+        printf("TestGatherer does not support being built on Windows.\n");
+        printf("If you have a Windows machine, please use Cygwin.\n");
+        exit(1);
+    #endif
     DIR *dir = opendir(basePath);
     if (!dir)
     {
