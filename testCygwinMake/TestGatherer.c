@@ -140,75 +140,110 @@ void lowerString(char* dest, char* src)
 
 bool isTestCaseDefinition(char* line)
 {
-    bool correctStartOfLine = strncmp(line, "void test", 9) == 0;
-    bool singleSpaceBetweenBoolAndTestName = (strstr(line, " ") == &line[4]);
+    LineMetrics* metrics = (LineMetrics*)malloc(sizeof(LineMetrics));
+    LineAnalysisResults* results = (LineAnalysisResults*)malloc(sizeof(LineAnalysisResults));
+    initLineMetrics(metrics);
+    initLineAnalysisResults(results);
+    
+    gatherLineMetrics(metrics, line);
+    analyzeLineMetrics(metrics, line);
+    determineResults(results, metrics, line);
 
-    int numSpaces = 0;
-    int numLeftBrackets = 0;
-    int numRightBrackets = 0;
-    bool hasSpecialCharacters = false;
-    int leftBracketIndex = 0;
-    int rightBracketIndex = 0;
+    bool isTestCase = results->correctStartOfLine && results->correctSpaces && results->correctBrackets && !results->hasSpecialCharacters;
 
-    int length = 0;
+    free(metrics);
+    free(results);
+    return isTestCase;
+}
+
+void gatherLineMetrics(LineMetrics* metrics, char* line)
+{
     char* currentPtr = line;
     while(*currentPtr != '\0' && *currentPtr != '\n')
     {
         if(*currentPtr == ' ')
         {
-            numSpaces++;
+            metrics->numSpaces++;
         }
         else if(*currentPtr == '(')
         {
-            numLeftBrackets++;
-            leftBracketIndex = length;
+            metrics->numLeftBrackets++;
+            metrics->leftBracketIndex = metrics->length;
         }
         else if(*currentPtr == ')')
         {
-            numRightBrackets++;
-            rightBracketIndex = length;
+            metrics->numRightBrackets++;
+            metrics->rightBracketIndex = metrics->length;
         }
-        length++;
+        metrics->length++;
         currentPtr++;
     }
+}
 
-
-    bool correctSpaces = singleSpaceBetweenBoolAndTestName && numSpaces == 1;
-
-    int expectedLeftBracketIndex = length - 3;
-    if(line[length-2] == '{')
+void analyzeLineMetrics(LineMetrics* metrics, char* line)
+{
+    //Line will have form:
+    //testSomething() or testSomthing(){
+    metrics->expectedLeftBracketIndex = metrics->length - 3;
+    if(theCurlyBraceIsOnTheSameLineAsTheTestName(line, metrics->length))
     {
-        expectedLeftBracketIndex--;
+        metrics->expectedLeftBracketIndex--;
     }
-    int expectedRightBracketIndex = expectedLeftBracketIndex + 1; 
+    metrics->expectedRightBracketIndex = metrics->expectedLeftBracketIndex + 1; 
+}
 
-    bool correctBracketCount = numLeftBrackets == 1 && numRightBrackets == 1; 
-    bool correctBracketPosition = leftBracketIndex == expectedLeftBracketIndex && rightBracketIndex == expectedRightBracketIndex;
-    bool correctBrackets = correctBracketCount && correctBracketPosition;
+void determineResults(LineAnalysisResults* results, LineMetrics* metrics, char* line)
+{
+    results->correctStartOfLine = strncmp(line, "void test", 9) == 0;
+    results->singleSpaceBetweenBoolAndTestName = (strstr(line, " ") == &line[4]);
+    results->correctSpaces = results->singleSpaceBetweenBoolAndTestName && metrics->numSpaces == 1;
 
-    if(correctStartOfLine && correctSpaces && correctBrackets)
+    results->correctBracketCount = metrics->numLeftBrackets == 1 && metrics->numRightBrackets == 1; 
+    results->correctBracketPosition = metrics->leftBracketIndex == metrics->expectedLeftBracketIndex && metrics->rightBracketIndex == metrics->expectedRightBracketIndex;
+    results->correctBrackets = results->correctBracketCount && results->correctBracketPosition;
+
+    if(results->correctStartOfLine && results->correctSpaces && results->correctBrackets)
     {
-        for(int i = 0; i < length; i++)
-        {
-            if(isSpecialCharacter(line[i]))
-            {
-                hasSpecialCharacters = true;
-            }
-        }
+        results->hasSpecialCharacters = lineHasSpecialCharacters(metrics, line);
+    }
+}
 
-        if(!hasSpecialCharacters)
-        {
-            return true;
-        }
-        else
+bool lineHasSpecialCharacters(LineMetrics* metrics, char* line)
+{
+    for(int i = 0; i < metrics->length; i++)
+    {
+        if(isSpecialCharacter(line[i]))
         {
             printf("\nGregTest does not accept test cases with special characters in the name of the test.\n");
             printf("%s\n\n", line);
-            return false;
+            return true;
         }
-        
     }
+
     return false;
+}
+
+void initLineMetrics(LineMetrics* metrics)
+{
+    metrics->numSpaces = 0;
+    metrics->numLeftBrackets = 0;
+    metrics->numRightBrackets = 0;
+    metrics->leftBracketIndex = 0;
+    metrics->rightBracketIndex = 0; 
+    metrics->length = 0;
+    metrics->expectedLeftBracketIndex = 0;
+    metrics->expectedRightBracketIndex = 0;
+}
+
+void initLineAnalysisResults(LineAnalysisResults* results)
+{
+    results->correctStartOfLine = false;
+    results->singleSpaceBetweenBoolAndTestName = false;
+    results->hasSpecialCharacters = false;
+    results->correctSpaces = false;
+    results->correctBracketCount = false;
+    results->correctBracketPosition = false;
+    results->correctBrackets = false;
 }
 
 void trimTestName(char* testName)
