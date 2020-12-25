@@ -111,42 +111,29 @@ void addTestCasesToList(TestCaseList* list, const char* path)
 
 bool isTestDir(char* dirName)
 {
-    bool result = false;
-    char* lower = lowerString(dirName);
-    if(strstr(lower, "/test") != NULL)
-    {
-        result = true;
-    }
-    free(lower);
-    return result;
+    char lower[WINDOWS_MAX_PATH_LENGTH];
+    lowerString(lower, dirName);
+    return strstr(lower, "/test") != NULL;
 }
 
 bool isTestFile(struct dirent *fileOrSubDirectory)
 {
-    char* lower = lowerString(fileOrSubDirectory->d_name);
+    char lower[WINDOWS_MAX_PATH_LENGTH];
+    lowerString(lower, fileOrSubDirectory->d_name);
     bool result = (strncmp(lower, "test", 4) == 0 && (strstr(lower, ".c") != NULL || strstr(lower, ".cpp") != NULL));
-    free(lower);
     return result;
 }
 
-char* lowerString(char* str)
+void lowerString(char* dest, char* src)
 {
-    int size = 0;
-
-    char* lower = (char*)malloc(sizeof(char));
-    lower[0] = '\0';
-
-    char* itr = str;
-    while(*itr != '\0')
+    char* srcItr = src;
+    char* destItr = dest;
+    while(*srcItr != '\0')
     {
-        char l = tolower(*itr);
-        lower = (char*)realloc(lower, size+2);
-        lower[size] = l;
-        lower[size+1] = '\0';
-        size++;
-        itr++;
+        *destItr = tolower(*srcItr);
+        destItr++;
+        srcItr++;
     }
-    return lower;
 }
 
 bool isTestCaseDefinition(char* line)
