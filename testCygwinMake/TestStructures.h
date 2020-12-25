@@ -1,12 +1,7 @@
 #ifndef TESTSTRUCTURES_H
 #define TESTSTRUCTURES_H
 
-#if defined(_WIN32) || defined(_WIN64)
-    #include <direct.h>
-#else 
-    #include <dirent.h>
-#endif
-
+#include <dirent.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
