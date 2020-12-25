@@ -11,13 +11,12 @@ int main(void)
         exit(1);
     #endif
     
-    char dir[WINDOWS_MAX_PATH_LENGTH] = ".";
+    char startingDirectory[WINDOWS_MAX_PATH_LENGTH] = ".";
 
     TestCaseList* testCases = (TestCaseList*)malloc(sizeof(TestCaseList));
     initTestCases(testCases);
 
-    loadTests(testCases, dir);
-
+    loadTests(testCases, startingDirectory);
     writeTestsToTestMain(testCases);
 
     freeTestCasesList(testCases);
@@ -35,36 +34,42 @@ void initTestCases(TestCaseList* testCases)
 void loadTests(TestCaseList* testCases, char* basePath)
 {
     char* path = (char*)malloc(WINDOWS_MAX_PATH_LENGTH * sizeof(char*));
-    struct dirent *dp;
-    #if defined(_WIN32) || defined(_WIN64)
-        printf("TestGatherer does not support being built on Windows.\n");
-        printf("If you have a Windows machine, please use Cygwin.\n");
-        exit(1);
-    #endif
-    DIR *dir = opendir(basePath);
-    if (!dir)
+    struct dirent *fileOrSubDirectory;
+
+    DIR *basePathDirectory = opendir(basePath);
+    if (!basePathDirectory)
     {
         return;
     }
 
-    while ((dp = readdir(dir)) != NULL)
+    while ((fileOrSubDirectory = readdir(basePathDirectory)) != NULL)
     {
-        strcpy(path, basePath);
-        strcat(path, "/");
-        strcat(path, dp->d_name);
+        copyFileOrSubDirectoryNameIntoPath(path, basePath, fileOrSubDirectory->d_name);
   
-        if(isTestDir(basePath) && isTestFile(dp->d_name))
+        if(isTestDir(basePath) && isTestFile(fileOrSubDirectory))
         {
             addTestCasesToList(testCases, path);
         }
-        if (strncmp(dp->d_name, ".", 1) != 0 && dp->d_type == DT_DIR)
+        if (isDirectory(fileOrSubDirectory))
         {
             loadTests(testCases, path);
         }
     }
 
-    closedir(dir);
+    closedir(basePathDirectory);
     free(path);
+}
+
+bool isDirectory(struct dirent *fileOrSubDirectory)
+{
+    return strncmp(fileOrSubDirectory->d_name, ".", 1) != 0 && fileOrSubDirectory->d_type == DT_DIR;
+}
+
+void copyFileOrSubDirectoryNameIntoPath(char* path, char* basePath, char* fileOrSubDirectoryName)
+{
+    strcpy(path, basePath);
+    strcat(path, "/");
+    strcat(path, fileOrSubDirectoryName);  
 }
 
 void freeTestCasesList(TestCaseList* list)
@@ -116,14 +121,10 @@ bool isTestDir(char* dirName)
     return result;
 }
 
-bool isTestFile(char* dirName)
+bool isTestFile(struct dirent *fileOrSubDirectory)
 {
-    bool result = false;
-    char* lower = lowerString(dirName);
-    if(strncmp(lower, "test", 4) == 0 && (strstr(lower, ".c") != NULL || strstr(lower, ".cpp") != NULL))
-    {
-        result = true;
-    }
+    char* lower = lowerString(fileOrSubDirectory->d_name);
+    bool result = (strncmp(lower, "test", 4) == 0 && (strstr(lower, ".c") != NULL || strstr(lower, ".cpp") != NULL));
     free(lower);
     return result;
 }
