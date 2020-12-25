@@ -219,9 +219,6 @@ bool isTestCaseDefinition(char* line)
 
 void trimTestName(char* testName)
 {
-    //testName will come in looking like:
-    //void testExampleName()
-    //This function will trim of the void and the brackets
     int length = strlen(testName) - 1;
     int endOffset = testNameEndOffset(testName);
     for(int i = 0; i < strlen(testName) - 1; i++)

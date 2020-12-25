@@ -17,9 +17,13 @@ bool isTestDir(char* dirName);
 bool isTestFile(struct dirent *fileOrSubDirectory);
 void lowerString(char* dest, char* src);
 bool isTestCaseDefinition(char* line);
-void trimTestName(char* testName);
 int testNameEndOffset(char* testName);
 bool theCurlyBraceIsOnTheSameLineAsTheTestName(char* testName, int initialLength);
 bool isSpecialCharacter(char c);
+
+//testName will come in looking like:
+//void testExampleName()
+//This function will trim of the void and the brackets
+void trimTestName(char* testName);
 
 #endif
