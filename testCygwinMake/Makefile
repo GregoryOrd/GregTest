@@ -1,5 +1,8 @@
 distDirectory = ../dist
 
+HelloWorld: testMain
+	dist/TestMain.exe
+
 testMain: $(distDirectory)
 
 	# Run the Test Gatherer to write the test cases into the TestMain.h and TestMain.c files

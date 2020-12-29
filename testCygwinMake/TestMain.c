@@ -13,12 +13,12 @@ int main()
 
 	if(result())
 	{
-		printf("All Tests Passed Successfully");
+		printf("All Tests Passed Successfully\n");
 		exit(0);
 	}
 	else
 	{
-		printf("Tests Failed");
+		printf("Tests Failed\n");
 	}
 	exit(1);
 }

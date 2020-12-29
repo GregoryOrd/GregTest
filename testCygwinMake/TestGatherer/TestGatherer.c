@@ -6,7 +6,7 @@
 
 int main(void) 
 {     
-    char startingDirectory[WINDOWS_MAX_PATH_LENGTH] = ".";
+    char startingDirectory[WINDOWS_MAX_PATH_LENGTH] = "C:/GregTest/testCygwinMake/src";
 
     TestCaseList* testCases = (TestCaseList*)malloc(sizeof(TestCaseList));
     initTestCases(testCases);

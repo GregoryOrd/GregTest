@@ -14,7 +14,7 @@ void writeToTestMainC(int numTests, TestCase* cases)
     char contents[size];
     contents[0] = '\0';
     populateTestMainCContents(contents, numTests, cases);
-    writeToFile("../TestMain.c", contents);
+    writeToFile("C:/GregTest/testCygwinMake/TestMain.c", contents);
 }
 
 void populateTestMainCContents(char* contents, int numTests, TestCase* cases)
@@ -64,12 +64,12 @@ void addTestMainCResultsCheckAndExits(char* main)
 {
     strcat(main, "\tif(result())\n");
     strcat(main, "\t{\n");
-    strcat(main, "\t\tprintf(\"All Tests Passed Successfully\");\n");
+    strcat(main, "\t\tprintf(\"All Tests Passed Successfully\\n\");\n");
     strcat(main, "\t\texit(0);\n");
     strcat(main, "\t}\n");
     strcat(main, "\telse\n");
     strcat(main, "\t{\n");
-    strcat(main, "\t\tprintf(\"Tests Failed\");\n");
+    strcat(main, "\t\tprintf(\"Tests Failed\\n\");\n");
     strcat(main, "\t}\n");
     strcat(main, "\texit(1);\n");
     strcat(main, "}\n");
@@ -84,7 +84,7 @@ void writeToTestMainH(int numTests, TestCase* cases)
     writeTestMainHGregTestDllImports(contents);
     writeTestMainHTestCaseDllImports(contents, numTests, cases);
     writeTestMainHEnd(contents);
-    writeToFile("../TestMain.h", contents);
+    writeToFile("C:/GregTest/testCygwinMake/TestMain.h", contents);
 }
 
 void writeTestMainHGuardsAndDllDefine(char* contents)
