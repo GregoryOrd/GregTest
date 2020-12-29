@@ -1,6 +1,11 @@
 #include <stdio.h>
 #include "HelloWorld.h"
 
+void main()
+{
+	printHelloWorld();
+}
+
 void printHelloWorld()
 {
 	const char* helloWorldStr = helloWorldString();

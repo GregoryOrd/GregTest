@@ -1,7 +1,6 @@
 TODO
 -----
-1) Refactor TestGatherer
-	1a) Split out TestFileDefinitions.h/.c and TestCaseDefinitions.h.c
+1) Have a GregTest.exe that runs the TestGatherer, then compiles TestMain, the executes TestMain.exe
 2) Have TestGatherer write into the make file
 3) Create a SourceFileGatherer that gather source files and writes them into the makefiles automatically
  so that they don't need to be put in there to compile everytime a new src file is added
