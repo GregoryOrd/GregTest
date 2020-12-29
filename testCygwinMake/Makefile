@@ -1,45 +1,22 @@
-# CC = gcc
-# CFLAGS = -g
+distDirectory = ../dist
 
-# all: helloworld
+testMain: $(distDirectory)
 
-# test:
-# 	# testCases.exe
+	# Run the Test Gatherer to write the test cases into the TestMain.h and TestMain.c files
+	TestGatherer/TestGathererAndWriter.exe
 
-# helloworld: helloworld.o
-# 	$(CC)$(LDFLAGS) -o $@ $^
-
-# helloworld.o: helloworld.c
-# 	$(CC)$(CCFLAGS) -c -o $@ $<
-
-clean: FRC
-	rm *.o *.dll *.exe
-
-FRC:
-
-# To Create HelloWorld.dll
-# Step 1) Use "gcc -c" to compile HelloWorld.c to object code
-# Step 2) Tell gcc it is building a shared library: gcc - shared -o HelloWorld.dll HelloWorld.o
-# Step 3) Link to the dll with: gcc -o TestMain TestMain.c -L./ -lHelloWorld.dll
-
-GregTest:
-	# Compile to .o files
-	gcc -c GregTest.c
-
-	# Link into a dll, then remove .o files
-	gcc -shared -o GregTest.dll GregTest.o
-	rm *.o
-
-testGatherer:
-	gcc TestGatherer.c TestMainWriter.c TestDefinitions.c -o TestGathererAndWriter.exe
-
-testMain: GregTest.dll
 	# Compile to .o files
 	gcc -c src/HelloWorld/testHelloWorld/TestHelloWorld.c src/HelloWorld/testHelloWorld/TestHelloWorld2.c src/HelloWorld/HelloWorld.c
 
-	# Link .o files together into a dll, then remove .o files
-	gcc -shared -o TestHelloWorld.dll TestHelloWorld.o TestHelloWorld2.o HelloWorld.o -L./ GregTest.dll
+	# Link .o files and GregTest.dll together into a TestHelloWorld.dll, then remove .o files
+	gcc -shared -o dist/TestHelloWorld.dll TestHelloWorld.o TestHelloWorld2.o HelloWorld.o -L./ dist/GregTest.dll
 	rm *.o
 
 	# Link TestMain to the dll
-	gcc -o TestMain TestMain.c -L./ TestHelloWorld.dll GregTest.dll
+	gcc -o dist/TestMain TestMain.c -L./ dist/TestHelloWorld.dll dist/GregTest.dll
+
+$(distDirectory):
+	mkdir ../dist
+
+clean:
+	rm *.o dist/TestHelloWorld.dll

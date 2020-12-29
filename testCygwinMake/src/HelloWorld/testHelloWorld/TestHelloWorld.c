@@ -1,5 +1,5 @@
 #include "../HelloWorld.h"
-#include "../../../GregTest.h"
+#include "../../GregTest.h"
 
 void testHelloWorldString()
 {

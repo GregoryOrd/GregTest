@@ -3,7 +3,7 @@
 
 #define DllImport __declspec(dllimport)
 
-//From GregTest
+//For GregTest
 DllImport bool result();
 
 //From Tests Written Throughout the Repo

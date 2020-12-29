@@ -18,8 +18,7 @@ int main()
 	}
 	else
 	{
-		printf("Tests Failed\n");
+		printf("Tests Failed");
 	}
-	
 	exit(1);
 }

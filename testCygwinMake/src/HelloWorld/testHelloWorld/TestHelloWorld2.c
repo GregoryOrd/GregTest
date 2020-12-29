@@ -1,4 +1,4 @@
-#include "../../../GregTest.h"
+#include "../../GregTest.h"
 
 void testMySt456uff(){
 	const char* expected = "Hello World";
