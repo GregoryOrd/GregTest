@@ -6,6 +6,9 @@
 #define TEST_MAIN_H_BASE_SIZE 45
 #define TEST_MAIN_H_SIZE_INCREMENT_PER_TESTCASE 20
 
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 #include "TestStructureDefs.h"
 
 void writeTestsToTestMain(TestCaseList* testCaseList);

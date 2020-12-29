@@ -31,7 +31,7 @@ GregTest:
 	rm *.o
 
 testGatherer:
-	gcc TestGatherer.c TestMainWriter.c -o TestGathererAndWriter.exe
+	gcc TestGatherer.c TestMainWriter.c TestDefinitions.c -o TestGathererAndWriter.exe
 
 testMain: GregTest.dll
 	# Compile to .o files
