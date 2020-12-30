@@ -1,7 +1,7 @@
 distDirectory = ../dist
 
 GregTestMain: $(distDirectory)
-	gcc GregTestMain.c ../TestGatherer/TestGatherer.c ../TestGatherer/TestMainWriter.c ../TestGatherer/TestDefinitions.c -o ../dist/GregTest.exe
+	gcc GregTestMain.c TestGatherer/TestGatherer.c TestGatherer/TestMainWriter.c TestGatherer/TestDefinitions.c -o ../dist/GregTest.exe
 
 GregTestDll: $(distDirectory)
 	# Compile to .o files

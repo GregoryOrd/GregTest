@@ -1,7 +1,7 @@
 #include "GregTestMain.h"
 
-#include "../TestGatherer/TestGatherer.h"
-#include "../TestGatherer/TestMainWriter.h"
+#include "TestGatherer/TestGatherer.h"
+#include "TestGatherer/TestMainWriter.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <sys/types.h> /* for pid_t */
