@@ -4,20 +4,6 @@
 #include "TestDefinitions.h"
 #include "TestMainWriter.h"
 
-int main(void) 
-{     
-    char startingDirectory[WINDOWS_MAX_PATH_LENGTH] = "C:/GregTest/testCygwinMake/src";
-
-    TestCaseList* testCases = (TestCaseList*)malloc(sizeof(TestCaseList));
-    initTestCases(testCases);
-
-    loadTests(testCases, startingDirectory);
-    writeTestsToTestMain(testCases);
-
-    freeTestCasesList(testCases);
-    exit(0);
-} 
-
 void initTestCases(TestCaseList* testCases)
 {
     testCases->size = 0;

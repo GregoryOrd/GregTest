@@ -1,5 +1,7 @@
 #include "GregTestMain.h"
 
+#include "../TestGatherer/TestGatherer.h"
+#include "../TestGatherer/TestMainWriter.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <sys/types.h> /* for pid_t */
@@ -30,8 +32,15 @@ int main()
 
 void runTestGatherer()
 {
-    char * const argv[] = {"C:/GregTest/testCygwinMake/dist/TestGathererAndWriter.exe", NULL};
-    forkAndRunChildProcess("C:/GregTest/testCygwinMake/dist/TestGathererAndWriter.exe", argv);
+    char startingDirectory[WINDOWS_MAX_PATH_LENGTH] = "C:/GregTest/testCygwinMake/src";
+
+    TestCaseList* testCases = (TestCaseList*)malloc(sizeof(TestCaseList));
+    initTestCases(testCases);
+
+    loadTests(testCases, startingDirectory);
+    writeTestsToTestMain(testCases);
+
+    freeTestCasesList(testCases);
 }
 
 void compileIntoObjectFiles()
