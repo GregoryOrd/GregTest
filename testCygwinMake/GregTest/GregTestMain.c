@@ -20,12 +20,17 @@ int main()
     compileIntoObjectFiles();
     linkObjectFilesWithGregTestDllToMakeProjectDll();
     createTestMainExecutableFromProjectDllAndGregTestDll();
-    return 0;
+    if(!runTests())
+    {
+        //Tests Passed
+        return 0;
+    }
+    return 1;
 }
 
 void runTestGatherer()
 {
-    char * const argv[] = {"C:/GregTest/testCygwinMake/dist/TestGathererAndWriter.exe",NULL};
+    char * const argv[] = {"C:/GregTest/testCygwinMake/dist/TestGathererAndWriter.exe", NULL};
     forkAndRunChildProcess("C:/GregTest/testCygwinMake/dist/TestGathererAndWriter.exe", argv);
 }
 
@@ -50,8 +55,15 @@ void createTestMainExecutableFromProjectDllAndGregTestDll()
     forkAndRunChildProcess("/usr/bin/gcc.exe", argv); 
 }
 
-void forkAndRunChildProcess(const char * pathToExecutable, char * const argv[])
+int runTests()
 {
+    char * const argv[] = {"C:/GregTest/testCygwinMake/dist/TestMain.exe"};
+    forkAndRunChildProcess("C:/GregTest/testCygwinMake/dist/TestMain.exe", argv); 
+}
+
+int forkAndRunChildProcess(const char * pathToExecutable, char * const argv[])
+{
+    int status;
     #ifdef __unix__
     /*Spawn a child to run the program.*/
     pid_t pid=fork();
@@ -60,15 +72,20 @@ void forkAndRunChildProcess(const char * pathToExecutable, char * const argv[])
         exit(1); /* only if execv fails */
     }
     else { /* pid!=0; parent process */
-        waitpid(pid,0,0); /* wait for child to exit */
+        int status;
+        waitpid(pid, &status, 0); /* wait for child to exit */
+        if (WIFEXITED(status)) 
+        { 
+            return WEXITSTATUS(status);         
+        } 
     } 
     #endif
 
     #ifdef __WIN32__
-    FILE *fp;
-    int status;
-
     status = spawnv(P_WAIT, pathToExecutable, argv);
-
+    if(WIFEXITED(status)) 
+    { 
+        return = WEXITSTATUS(status);         
+    } 
     #endif
 }

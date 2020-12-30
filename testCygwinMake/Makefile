@@ -3,10 +3,6 @@ HelloWorld:
 	dist/GregTest.exe
 
 	@echo
-	# Run the tests (TestMain.exe)
-	dist/TestMain.exe
-
-	@echo
 	# Remove TestMain.c and TestMain.exe
 	rm TestMain.h TestMain.c
 	rm dist/TestMain.exe

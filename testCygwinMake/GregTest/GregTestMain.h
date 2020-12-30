@@ -5,6 +5,7 @@ void runTestGatherer();
 void compileIntoObjectFiles();
 void linkObjectFilesWithGregTestDllToMakeProjectDll();
 void createTestMainExecutableFromProjectDllAndGregTestDll();
-void forkAndRunChildProcess(const char * pathToExecutable, char * const argv[]);
+int runTests();
+int forkAndRunChildProcess(const char * pathToExecutable, char * const argv[]);
 
 #endif
