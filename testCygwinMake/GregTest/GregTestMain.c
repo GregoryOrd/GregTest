@@ -24,6 +24,7 @@ int main()
     createTestMainExecutableFromProjectDllAndGregTestDll();
     int testResults = runTests();
     removeProjectTestDll();
+    removeTestMainArtifacts();
     if(!testResults)
     {
         //Tests Passed
@@ -69,13 +70,19 @@ void createTestMainExecutableFromProjectDllAndGregTestDll()
 int runTests()
 {
     char * const argv[] = {"C:/GregTest/testCygwinMake/dist/TestMain.exe"};
-    forkAndRunChildProcess("C:/GregTest/testCygwinMake/dist/TestMain.exe", argv); 
+    return forkAndRunChildProcess("C:/GregTest/testCygwinMake/dist/TestMain.exe", argv); 
 }
 
 void removeProjectTestDll()
 {
     char * const argv[] = {"/usr/bin/rm.exe", "C:/GregTest/testCygwinMake/dist/TestHelloWorld.dll"};
     forkAndRunChildProcess("/usr/bin/rm.exe", argv);     
+}
+
+void removeTestMainArtifacts()
+{
+    char * const argv[] = {"/usr/bin/rm.exe", "C:/GregTest/testCygwinMake/dist/TestMain.exe", "C:/GregTest/testCygwinMake/TestMain.h", "C:/GregTest/testCygwinMake/TestMain.c"};
+    forkAndRunChildProcess("/usr/bin/rm.exe", argv);    
 }
 
 int forkAndRunChildProcess(const char * pathToExecutable, char * const argv[])

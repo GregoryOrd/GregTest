@@ -2,10 +2,6 @@ distDirectory = ../dist
 HelloWorld:
 	dist/GregTest.exe
 
-	@echo
-	# Remove TestMain.c and TestMain.exe
-	rm TestMain.h TestMain.c
-	rm dist/TestMain.exe
 
 	@echo
 	# Compile the actual program now that the tests have passed

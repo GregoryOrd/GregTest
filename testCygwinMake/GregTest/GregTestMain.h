@@ -7,6 +7,7 @@ void linkObjectFilesWithGregTestDllToMakeProjectTestDll();
 void createTestMainExecutableFromProjectDllAndGregTestDll();
 int runTests();
 void removeProjectTestDll();
+void removeTestMainArtifacts();
 int forkAndRunChildProcess(const char * pathToExecutable, char * const argv[]);
 
 #endif
