@@ -18,6 +18,7 @@
 
 int main()
 {
+    int retval = 1;
     runTestGatherer();
     compileIntoObjectFiles();
     linkObjectFilesWithGregTestDllToMakeProjectTestDll();
@@ -28,14 +29,24 @@ int main()
     if(!testResults)
     {
         //Tests Passed
-        return 0;
+        if(!compileObjectFilesIntoProjectExecutable())
+        {
+            printf("Build Successful!\n");
+        }
+        else
+        {
+            printf("Error Compiling the Code After Tests Completed\n");
+        }
+        
+        retval = 0;
     }
-    return 1;
+    removeObjectFiles();
+    return retval;
 }
 
 void runTestGatherer()
 {
-    char startingDirectory[WINDOWS_MAX_PATH_LENGTH] = "C:/GregTest/testCygwinMake/src";
+    char startingDirectory[WINDOWS_MAX_PATH_LENGTH] = "src";
 
     TestCaseList* testCases = (TestCaseList*)malloc(sizeof(TestCaseList));
     initTestCases(testCases);
@@ -48,41 +59,53 @@ void runTestGatherer()
 
 void compileIntoObjectFiles()
 {
-    char * const argv[] = {"/usr/bin/gcc.exe", "-c", "C:/GregTest/testCygwinMake/src/HelloWorld/testHelloWorld/TestHelloWorld.c",
-    "C:/GregTest/testCygwinMake/src/HelloWorld/testHelloWorld/TestHelloWorld2.c", "C:/GregTest/testCygwinMake/src/HelloWorld/HelloWorld.c"};
+    char * const argv[] = {"/usr/bin/gcc.exe", "-c", "src/HelloWorld/testHelloWorld/TestHelloWorld.c",
+    "src/HelloWorld/testHelloWorld/TestHelloWorld2.c", "src/HelloWorld/HelloWorld.c", NULL};
     forkAndRunChildProcess("/usr/bin/gcc.exe", argv);
 }
 
 void linkObjectFilesWithGregTestDllToMakeProjectTestDll()
 {
-    char * const argv[] = {"/usr/bin/gcc.exe", "-shared", "-o", "C:/GregTest/testCygwinMake/dist/TestHelloWorld.dll",
-    "TestHelloWorld.o", "TestHelloWorld2.o", "HelloWorld.o", "-L./", "C:/GregTest/testCygwinMake/dist/GregTest.dll"};
+    char * const argv[] = {"/usr/bin/gcc.exe", "-shared", "-o", "dist/TestHelloWorld.dll",
+    "TestHelloWorld.o", "TestHelloWorld2.o", "HelloWorld.o", "-L./", "dist/GregTest.dll", NULL};
     forkAndRunChildProcess("/usr/bin/gcc.exe", argv);
 }
 
 void createTestMainExecutableFromProjectDllAndGregTestDll()
 {
-    char * const argv[] = {"/usr/bin/gcc.exe", "-o", "C:/GregTest/testCygwinMake/dist/TestMain",
-    "C:/GregTest/testCygwinMake/TestMain.c", "-L./", "C:/GregTest/testCygwinMake/dist/TestHelloWorld.dll", "C:/GregTest/testCygwinMake/dist/GregTest.dll"};
+    char * const argv[] = {"/usr/bin/gcc.exe", "-o", "dist/TestMain",
+    "TestMain.c", "-L./", "dist/TestHelloWorld.dll", "dist/GregTest.dll", NULL};
     forkAndRunChildProcess("/usr/bin/gcc.exe", argv); 
 }
 
 int runTests()
 {
-    char * const argv[] = {"C:/GregTest/testCygwinMake/dist/TestMain.exe"};
-    return forkAndRunChildProcess("C:/GregTest/testCygwinMake/dist/TestMain.exe", argv); 
+    char * const argv[] = {"dist/TestMain.exe", NULL};
+    return forkAndRunChildProcess("dist/TestMain.exe", argv); 
 }
 
 void removeProjectTestDll()
 {
-    char * const argv[] = {"/usr/bin/rm.exe", "C:/GregTest/testCygwinMake/dist/TestHelloWorld.dll"};
+    char * const argv[] = {"/usr/bin/rm.exe", "dist/TestHelloWorld.dll", NULL};
     forkAndRunChildProcess("/usr/bin/rm.exe", argv);     
 }
 
 void removeTestMainArtifacts()
 {
-    char * const argv[] = {"/usr/bin/rm.exe", "C:/GregTest/testCygwinMake/dist/TestMain.exe", "C:/GregTest/testCygwinMake/TestMain.h", "C:/GregTest/testCygwinMake/TestMain.c"};
+    char * const argv[] = {"/usr/bin/rm.exe", "dist/TestMain.exe", "TestMain.h", "TestMain.c", NULL};
     forkAndRunChildProcess("/usr/bin/rm.exe", argv);    
+}
+
+int compileObjectFilesIntoProjectExecutable()
+{
+    char * const argv[] = {"/usr/bin/gcc.exe", "HelloWorld.o", "-o", "dist/HelloWorld.exe", NULL};
+    forkAndRunChildProcess("/usr/bin/gcc.exe", argv);   
+}
+
+void removeObjectFiles()
+{
+    char * const argv[] = {"/usr/bin/rm.exe", "HelloWorld.o", "TestHelloWorld.o", "TestHelloWorld2.o", NULL};
+    forkAndRunChildProcess("/usr/bin/rm.exe", argv);  
 }
 
 int forkAndRunChildProcess(const char * pathToExecutable, char * const argv[])
