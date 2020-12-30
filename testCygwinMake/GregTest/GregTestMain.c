@@ -19,13 +19,12 @@
 int main()
 {
     int retval = 1;
+    makeDir("temp");
     runTestGatherer();
-    compileIntoObjectFiles();
+    compileIntoTempObjectFiles();
     linkObjectFilesWithGregTestDllToMakeProjectTestDll();
     createTestMainExecutableFromProjectDllAndGregTestDll();
     int testResults = runTests();
-    removeProjectTestDll();
-    removeTestMainArtifacts();
     if(!testResults)
     {
         //Tests Passed
@@ -40,8 +39,14 @@ int main()
         
         retval = 0;
     }
-    removeObjectFiles();
+    removeFolder("temp");
     return retval;
+}
+
+void makeDir(char* dirName)
+{
+    char* const argv[] = {"/usr/bin/mkdir.exe", dirName, NULL};
+    forkAndRunChildProcess("/usr/bin/mkdir.exe", argv);
 }
 
 void runTestGatherer()
@@ -57,54 +62,59 @@ void runTestGatherer()
     freeTestCasesList(testCases);
 }
 
-void compileIntoObjectFiles()
+void compileIntoTempObjectFiles()
 {
     char * const argv[] = {"/usr/bin/gcc.exe", "-c", "src/HelloWorld/testHelloWorld/TestHelloWorld.c",
     "src/HelloWorld/testHelloWorld/TestHelloWorld2.c", "src/HelloWorld/HelloWorld.c", NULL};
     forkAndRunChildProcess("/usr/bin/gcc.exe", argv);
+
+    char* const argv2[] = {"/usr/bin/mv.exe", "HelloWorld.o", "TestHelloWorld.o", "TestHelloWorld2.o", "temp", NULL};
+    forkAndRunChildProcess("/usr/bin/mv.exe", argv2);
 }
 
 void linkObjectFilesWithGregTestDllToMakeProjectTestDll()
 {
-    char * const argv[] = {"/usr/bin/gcc.exe", "-shared", "-o", "dist/TestHelloWorld.dll",
-    "TestHelloWorld.o", "TestHelloWorld2.o", "HelloWorld.o", "-L./", "dist/GregTest.dll", NULL};
+    char * const argv[] = {"/usr/bin/gcc.exe", "-shared", "-o", "temp/TestHelloWorld.dll",
+    "temp/TestHelloWorld.o", "temp/TestHelloWorld2.o", "temp/HelloWorld.o", "-L./", "lib/GregTest.dll", NULL};
     forkAndRunChildProcess("/usr/bin/gcc.exe", argv);
 }
 
 void createTestMainExecutableFromProjectDllAndGregTestDll()
 {
-    char * const argv[] = {"/usr/bin/gcc.exe", "-o", "dist/TestMain",
-    "TestMain.c", "-L./", "dist/TestHelloWorld.dll", "dist/GregTest.dll", NULL};
+    char * const argv[] = {"/usr/bin/gcc.exe", "-o", "temp/TestMain",
+    "temp/TestMain.c", "-L./", "temp/TestHelloWorld.dll", "lib/GregTest.dll", NULL};
     forkAndRunChildProcess("/usr/bin/gcc.exe", argv); 
 }
 
 int runTests()
-{
-    char * const argv[] = {"dist/TestMain.exe", NULL};
-    return forkAndRunChildProcess("dist/TestMain.exe", argv); 
-}
+{ 
+    char * const argv[] = {"/usr/bin/cp.exe", "temp/TestHelloWorld.dll", ".", NULL};
+    forkAndRunChildProcess("/usr/bin/cp.exe", argv);
 
-void removeProjectTestDll()
-{
-    char * const argv[] = {"/usr/bin/rm.exe", "dist/TestHelloWorld.dll", NULL};
-    forkAndRunChildProcess("/usr/bin/rm.exe", argv);     
-}
+    char * const argv1[] = {"/usr/bin/cp.exe", "lib/GregTest.dll", ".", NULL};
+    forkAndRunChildProcess("/usr/bin/cp.exe", argv1);
 
-void removeTestMainArtifacts()
-{
-    char * const argv[] = {"/usr/bin/rm.exe", "dist/TestMain.exe", "TestMain.h", "TestMain.c", NULL};
-    forkAndRunChildProcess("/usr/bin/rm.exe", argv);    
+    char * const argv2[] = {"temp/TestMain.exe", NULL};
+    int testResult = forkAndRunChildProcess("temp/TestMain.exe", argv2); 
+
+    char * const argv3[] = {"/usr/bin/rm.exe", "GregTest.dll", NULL};
+    forkAndRunChildProcess("/usr/bin/rm.exe", argv3); 
+
+    char * const argv4[] = {"/usr/bin/rm.exe", "TestHelloWorld.dll", NULL};
+    forkAndRunChildProcess("/usr/bin/rm.exe", argv4); 
+
+    return testResult;
 }
 
 int compileObjectFilesIntoProjectExecutable()
 {
-    char * const argv[] = {"/usr/bin/gcc.exe", "HelloWorld.o", "-o", "dist/HelloWorld.exe", NULL};
+    char * const argv[] = {"/usr/bin/gcc.exe", "temp/HelloWorld.o", "-o", "dist/HelloWorld.exe", NULL};
     forkAndRunChildProcess("/usr/bin/gcc.exe", argv);   
 }
 
-void removeObjectFiles()
+void removeFolder(char* folderName)
 {
-    char * const argv[] = {"/usr/bin/rm.exe", "HelloWorld.o", "TestHelloWorld.o", "TestHelloWorld2.o", NULL};
+    char * const argv[] = {"/usr/bin/rm.exe", folderName, "-r", NULL};
     forkAndRunChildProcess("/usr/bin/rm.exe", argv);  
 }
 

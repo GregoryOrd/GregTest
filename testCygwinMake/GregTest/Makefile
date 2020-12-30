@@ -1,7 +1,7 @@
 distDirectory = ../dist
 
 GregTestMain: $(distDirectory)
-	gcc GregTestMain.c TestGatherer/TestGatherer.c TestGatherer/TestMainWriter.c TestGatherer/TestDefinitions.c -o ../dist/GregTest.exe
+	gcc GregTestMain.c TestGatherer/TestGatherer.c TestGatherer/TestMainWriter.c TestGatherer/TestDefinitions.c -o ../GregTest.exe
 
 GregTestDll: $(distDirectory)
 	# Compile to .o files
@@ -9,14 +9,14 @@ GregTestDll: $(distDirectory)
 
 	# Link into a dll, then remove .o files
 	# Make two copies of the dll. One for this folder, one for the dist folder
-	gcc -shared -o ../dist/GregTest.dll GregTest.o
+	gcc -shared -o ../lib/GregTest.dll GregTest.o
 	rm *.o
 
 $(distDirectory):
 	mkdir ../dist
 
 clean:
-	rm ../dist/GregTest.exe
-	rm ../dist/GregTest.dll
-	rm ../dist/TestHelloWorld.dll
+	rm ../GregTest.exe
+	rm ../lib/GregTest.dll
+	rm ../lib/TestHelloWorld.dll
 	rm *.o

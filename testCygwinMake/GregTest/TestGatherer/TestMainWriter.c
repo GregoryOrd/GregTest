@@ -14,7 +14,7 @@ void writeToTestMainC(int numTests, TestCase* cases)
     char contents[size];
     contents[0] = '\0';
     populateTestMainCContents(contents, numTests, cases);
-    writeToFile("C:/GregTest/testCygwinMake/TestMain.c", contents);
+    writeToFile("C:/GregTest/testCygwinMake/temp/TestMain.c", contents);
 }
 
 void populateTestMainCContents(char* contents, int numTests, TestCase* cases)
@@ -84,7 +84,7 @@ void writeToTestMainH(int numTests, TestCase* cases)
     writeTestMainHGregTestDllImports(contents);
     writeTestMainHTestCaseDllImports(contents, numTests, cases);
     writeTestMainHEnd(contents);
-    writeToFile("C:/GregTest/testCygwinMake/TestMain.h", contents);
+    writeToFile("C:/GregTest/testCygwinMake/temp/TestMain.h", contents);
 }
 
 void writeTestMainHGuardsAndDllDefine(char* contents)

@@ -1,15 +1,17 @@
 #ifndef GREG_TEST_MAIN
 #define GREG_TEST_MAIN 
 
+void makeDir(char* dirName);
 void runTestGatherer();
-void compileIntoObjectFiles();
+void compileIntoTempObjectFiles();
 void linkObjectFilesWithGregTestDllToMakeProjectTestDll();
 void createTestMainExecutableFromProjectDllAndGregTestDll();
 int runTests();
-void removeProjectTestDll();
-void removeTestMainArtifacts();
 int compileObjectFilesIntoProjectExecutable();
-void removeObjectFiles();
+void changeDirectory(char* dirToMoveTo);
+void copyTestProjectDllIntoTopLevelDir();
+void copyGregTestDllIntoTopLevelDir();
+void removeFolder(char* folderName);
 int forkAndRunChildProcess(const char * pathToExecutable, char * const argv[]);
 
 #endif
