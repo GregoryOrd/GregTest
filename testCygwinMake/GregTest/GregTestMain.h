@@ -3,9 +3,10 @@
 
 void runTestGatherer();
 void compileIntoObjectFiles();
-void linkObjectFilesWithGregTestDllToMakeProjectDll();
+void linkObjectFilesWithGregTestDllToMakeProjectTestDll();
 void createTestMainExecutableFromProjectDllAndGregTestDll();
 int runTests();
+void removeProjectTestDll();
 int forkAndRunChildProcess(const char * pathToExecutable, char * const argv[]);
 
 #endif

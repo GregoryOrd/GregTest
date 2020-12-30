@@ -20,9 +20,11 @@ int main()
 {
     runTestGatherer();
     compileIntoObjectFiles();
-    linkObjectFilesWithGregTestDllToMakeProjectDll();
+    linkObjectFilesWithGregTestDllToMakeProjectTestDll();
     createTestMainExecutableFromProjectDllAndGregTestDll();
-    if(!runTests())
+    int testResults = runTests();
+    removeProjectTestDll();
+    if(!testResults)
     {
         //Tests Passed
         return 0;
@@ -50,7 +52,7 @@ void compileIntoObjectFiles()
     forkAndRunChildProcess("/usr/bin/gcc.exe", argv);
 }
 
-void linkObjectFilesWithGregTestDllToMakeProjectDll()
+void linkObjectFilesWithGregTestDllToMakeProjectTestDll()
 {
     char * const argv[] = {"/usr/bin/gcc.exe", "-shared", "-o", "C:/GregTest/testCygwinMake/dist/TestHelloWorld.dll",
     "TestHelloWorld.o", "TestHelloWorld2.o", "HelloWorld.o", "-L./", "C:/GregTest/testCygwinMake/dist/GregTest.dll"};
@@ -68,6 +70,12 @@ int runTests()
 {
     char * const argv[] = {"C:/GregTest/testCygwinMake/dist/TestMain.exe"};
     forkAndRunChildProcess("C:/GregTest/testCygwinMake/dist/TestMain.exe", argv); 
+}
+
+void removeProjectTestDll()
+{
+    char * const argv[] = {"/usr/bin/rm.exe", "C:/GregTest/testCygwinMake/dist/TestHelloWorld.dll"};
+    forkAndRunChildProcess("/usr/bin/rm.exe", argv);     
 }
 
 int forkAndRunChildProcess(const char * pathToExecutable, char * const argv[])
