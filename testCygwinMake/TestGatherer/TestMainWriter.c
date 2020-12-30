@@ -122,7 +122,6 @@ int sizeOfTestMainC(int numTests)
 {
     int size = TEST_MAIN_C_BASE_SIZE;
     size += (numTests * (TEST_MAIN_C_SIZE_INCREMENT_PER_TESTCASE + WINDOWS_MAX_PATH_LENGTH * sizeof(char*)));
-    printf("SIZE of TestMain.c: %d\n", size);
     return size;
 }
 
@@ -130,7 +129,6 @@ int sizeOfTestMainH(int numTests)
 {
     int size = TEST_MAIN_C_BASE_SIZE;
     size += (numTests * (TEST_MAIN_H_SIZE_INCREMENT_PER_TESTCASE + WINDOWS_MAX_PATH_LENGTH * sizeof(char*)));
-    printf("SIZE of TestMain.h: %d\n", size);
     return size;
 }
 

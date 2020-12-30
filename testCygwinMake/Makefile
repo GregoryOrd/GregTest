@@ -1,5 +1,4 @@
 distDirectory = ../dist
-
 HelloWorld: testMain
 
 	@echo
@@ -20,7 +19,7 @@ HelloWorld: testMain
 
 	@echo
 	@echo
-	@echo Build Successful! 
+	@echo Build Successful!
 
 testMain: $(distDirectory)
 
