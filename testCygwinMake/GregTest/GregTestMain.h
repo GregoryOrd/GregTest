@@ -5,12 +5,12 @@
 #include "TestGatherer/SourceFileStructureDefs.h"
 
 void makeDir(char* dirName);
-void runTestGatherer(TestCaseList* testCases, SourceFileList* sourceFiles);
-void printTestCaseList(const TestCaseList* list);
+void runTestGatherer(TestFileList* testFiles, SourceFileList* sourceFiles);
+void printTestCases(const TestFile* list);
 void printSourceFiles(const SourceFileList* list);
-int numTestFiles(TestCaseList* testCases);
-void compileIntoTempObjectFiles(TestCaseList* testCases, SourceFileList* sourceFiles);
-void populateArgsFor_compileIntoTempObjectFiles(char** argv, TestCaseList* testCases, SourceFileList* sourceFiles, int numGccArgs);
+void printTestFiles(const TestFileList* list);
+void compileIntoTempObjectFiles(TestFileList* testCases, SourceFileList* sourceFiles);
+void populateArgsFor_compileIntoTempObjectFiles(char** argv, TestFileList* testCases, SourceFileList* sourceFiles, int numGccArgs);
 void linkObjectFilesWithGregTestDllToMakeProjectTestDll();
 void createTestMainExecutableFromProjectDllAndGregTestDll();
 int runTests();

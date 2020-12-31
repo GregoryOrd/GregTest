@@ -2,31 +2,33 @@
 
 #include "../GregTestConstants.h"
 
-void writeTestsToTestMain(TestCaseList* testCaseList)
+void writeTestsToTestMain(TestFileList* testFiles)
 {
-    int numTests = testCaseList->size;
-    TestCase* cases = testCaseList->cases;
-    writeToTestMainC(numTests, cases);
-    writeToTestMainH(numTests, cases);
+    writeToTestMainC(testFiles);
+    writeToTestMainH(testFiles);
 }
 
-void writeToTestMainC(int numTests, TestCase* cases)
+void writeToTestMainC(TestFileList* testFiles)
 {
-    int size = sizeOfTestMainC(numTests);
+    int size = sizeOfTestMainC(testFiles->totalNumTestCases);
     char contents[size];
     contents[0] = '\0';
-    populateTestMainCContents(contents, numTests, cases);
+    populateTestMainCContents(contents, testFiles);
     char testMainC[WINDOWS_MAX_PATH_LENGTH] = TEMP_DIR;
     strcat(testMainC, "/TestMain.c");
     writeToFile(testMainC, contents);
 }
 
-void populateTestMainCContents(char* contents, int numTests, TestCase* cases)
+void populateTestMainCContents(char* contents, TestFileList* testFiles)
 {
     addTestMainCIncludes(contents);
     strcat(contents, "int main()\n{\n");
-    addTestMainCFunctionPointerDefinitions(contents, numTests, cases);
-    addTestMainCFunctionPointerCalls(contents, numTests, cases);
+
+    //The Function Pointer Definitions and Calls are added seperately so that all definitions
+    //are written to the file before the first call
+    addTestMainCFunctionPointerDefinitions(contents, testFiles);
+    addTestMainCFunctionPointerCalls(contents, testFiles);
+
     addTestMainCResultsCheckAndExits(contents);
 }
 
@@ -38,7 +40,25 @@ void addTestMainCIncludes(char* main)
     strcat(main, "#include \"TestMain.h\"\n\n");
 }
 
-void addTestMainCFunctionPointerDefinitions(char* main, int numTests, TestCase* cases)
+void addTestMainCFunctionPointerDefinitions(char* main, TestFileList* testFiles)
+{
+    for(int fileIndex = 0; fileIndex < testFiles->size; fileIndex++)
+    {
+        TestFile* file = &testFiles->files[fileIndex];
+        addTestMainCFunctionPointerDefinitionsForSpecificFile(main, file->numTestCases, file->cases);
+    }
+}
+
+void addTestMainCFunctionPointerCalls(char* main, TestFileList* testFiles)
+{
+    for(int fileIndex = 0; fileIndex < testFiles->size; fileIndex++)
+    {
+        TestFile* file = &testFiles->files[fileIndex];
+        addTestMainCFunctionPointerCallsForSpecificFile(main, file->numTestCases, file->cases);
+    }
+}
+
+void addTestMainCFunctionPointerDefinitionsForSpecificFile(char* main, int numTests, TestCase* cases)
 {
     for(int i = 0; i < numTests; i++)
     {
@@ -52,7 +72,7 @@ void addTestMainCFunctionPointerDefinitions(char* main, int numTests, TestCase* 
     strcat(main, "\n");
 }
 
-void addTestMainCFunctionPointerCalls(char* main, int numTests, TestCase* cases)
+void addTestMainCFunctionPointerCallsForSpecificFile(char* main, int numTests, TestCase* cases)
 {
     for(int i = 0; i < numTests; i++)
     {
@@ -79,14 +99,14 @@ void addTestMainCResultsCheckAndExits(char* main)
     strcat(main, "}\n");
 }
 
-void writeToTestMainH(int numTests, TestCase* cases)
+void writeToTestMainH(TestFileList* testFiles)
 {
-    int size = sizeOfTestMainH(numTests);
+    int size = sizeOfTestMainH(testFiles->totalNumTestCases);
     char contents[size];
     contents[0] = '\0';
     writeTestMainHGuardsAndDllDefine(contents);
     writeTestMainHGregTestDllImports(contents);
-    writeTestMainHTestCaseDllImports(contents, numTests, cases);
+    writeTestMainHTestCaseDllImports(contents, testFiles);
     writeTestMainHEnd(contents);
     char testMainH[WINDOWS_MAX_PATH_LENGTH] = TEMP_DIR;
     strcat(testMainH, "/TestMain.h");
@@ -106,7 +126,16 @@ void writeTestMainHGregTestDllImports(char* contents)
     strcat(contents, "DllImport bool result();\n\n");
 }
 
-void writeTestMainHTestCaseDllImports(char* contents, int numTests, TestCase* cases)
+void writeTestMainHTestCaseDllImports(char* contents, TestFileList* testFiles)
+{
+    for(int fileIndex = 0; fileIndex < testFiles->size; fileIndex++)
+    {
+        TestFile* file = &testFiles->files[fileIndex];
+        writeTestMainHTestCaseDllImportsForSpecificFile(contents, file->numTestCases, file->cases);
+    }
+}
+
+void writeTestMainHTestCaseDllImportsForSpecificFile(char* contents, int numTests, TestCase* cases)
 {
     strcat(contents, "//From Tests Written Throughout the Repo\n");
     for(int i = 0; i < numTests; i++)

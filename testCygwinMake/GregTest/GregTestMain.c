@@ -22,15 +22,15 @@ int main()
 {
     int retval = 1;
 
-    TestCaseList* testCases = (TestCaseList*)malloc(sizeof(TestCaseList));
-    initTestCases(testCases);
+    TestFileList* testFiles = (TestFileList*)malloc(sizeof(TestFileList));
+    initTestFiles(testFiles);
 
     SourceFileList* sourceFiles = (SourceFileList*)malloc(sizeof(SourceFileList));
     initSourceFiles(sourceFiles);
 
     makeDir(TEMP_DIR);
-    runTestGatherer(testCases, sourceFiles);
-    compileIntoTempObjectFiles(testCases, sourceFiles);
+    runTestGatherer(testFiles, sourceFiles);
+    compileIntoTempObjectFiles(testFiles, sourceFiles);
     linkObjectFilesWithGregTestDllToMakeProjectTestDll();
     createTestMainExecutableFromProjectDllAndGregTestDll();
     int testResults = runTests();
@@ -48,7 +48,7 @@ int main()
         retval = 0;
     }
     removeFolder(TEMP_DIR);
-    freeTestCasesList(testCases);
+    freeTestFileList(testFiles);
     freeSourceFileList(sourceFiles);
     return retval;
 }
@@ -59,15 +59,19 @@ void makeDir(char* dirName)
     forkAndRunChildProcess(mkdir, argv);
 }
 
-void runTestGatherer(TestCaseList* testCases, SourceFileList* sourceFiles)
+void runTestGatherer(TestFileList* testFiles, SourceFileList* sourceFiles)
 {
     char startingDirectory[WINDOWS_MAX_PATH_LENGTH] = SRC_DIR;
 
-    loadTestsAndSourceFiles(testCases, sourceFiles, startingDirectory);
-    writeTestsToTestMain(testCases);
+    loadTestsAndSourceFiles(testFiles, sourceFiles, startingDirectory);
+    writeTestsToTestMain(testFiles);
 
-    printTestCaseList(testCases);
+    for(int testFileIndex = 0; testFileIndex < testFiles->size; testFileIndex++)
+    {
+        printTestCases(&testFiles->files[testFileIndex]);
+    }
     printSourceFiles(sourceFiles);
+    printTestFiles(testFiles);
 }
 
 void printSourceFiles(const SourceFileList* list)
@@ -80,31 +84,36 @@ void printSourceFiles(const SourceFileList* list)
     printf("====================================\n");  
 }
 
-void printTestCaseList(const TestCaseList* list)
+void printTestCases(const TestFile* file)
 {
     printf("====================================\n");
-    for(int i = 0; i < list->size; i++)
+    for(int i = 0; i < file->numTestCases; i++)
     {
-        printf("file: %s || testCase: %s\n", list->cases[i].testFile, list->cases[i].testName);
+        printf("file: %s || testCase: %s\n", file->name, file->cases[i].testName);
     }  
     printf("====================================\n");
 }
 
-int numTestFiles(TestCaseList* testCases)
+void printTestFiles(const TestFileList* list)
 {
-    return 2;
+    printf("====================================\n");
+    for(int i = 0; i < list->size; i++)
+    {
+        printf("Test File: %s\n", list->files[i].name);
+    }  
+    printf("====================================\n");    
 }
 
-void compileIntoTempObjectFiles(TestCaseList* testCases, SourceFileList* sourceFiles)
+void compileIntoTempObjectFiles(TestFileList* testFiles, SourceFileList* sourceFiles)
 {
     // char * const argv[] = {gcc, "-c", "src/HelloWorld/testHelloWorld/TestHelloWorld.c",
     // "src/HelloWorld/testHelloWorld/TestHelloWorld2.c", "src/HelloWorld/HelloWorld.c", NULL};
 
-    int numGccArgs = numTestFiles(testCases) + sourceFiles->size + 3;
+    int numGccArgs = testFiles->size + sourceFiles->size + 3;
     int numMvArgs = numGccArgs - 1;
 
     char ** argv = malloc(numGccArgs * sizeof(char*));
-    populateArgsFor_compileIntoTempObjectFiles(argv, testCases, sourceFiles, numGccArgs);
+    populateArgsFor_compileIntoTempObjectFiles(argv, testFiles, sourceFiles, numGccArgs);
     forkAndRunChildProcess(gcc, argv);
 
     char* const argv2[] = {mv, "HelloWorld.o", "TestHelloWorld.o", "TestHelloWorld2.o", TEMP_DIR, NULL};
@@ -113,19 +122,19 @@ void compileIntoTempObjectFiles(TestCaseList* testCases, SourceFileList* sourceF
     free(argv);
 }
 
-void populateArgsFor_compileIntoTempObjectFiles(char** argv, TestCaseList* testCases, SourceFileList* sourceFiles, int numGccArgs)
+void populateArgsFor_compileIntoTempObjectFiles(char** argv, TestFileList* testFiles, SourceFileList* sourceFiles, int numGccArgs)
 {
     argv[0] = gcc;
     argv[1] = "-c";
 
     int argIndex = 2;
-    int testCaseIndex = 0;
+    int testFileIndex = 0;
     int sourceFileIndex = 0;
-    while(testCaseIndex < testCases->size)
+    while(testFileIndex < testFiles->size)
     {
-        argv[argIndex] = testCases->cases[testCaseIndex].testFile;
+        argv[argIndex] = testFiles->files[testFileIndex].name;
         argIndex++;
-        testCaseIndex++;
+        testFileIndex++;
     }
 
     while(sourceFileIndex < sourceFiles->size)

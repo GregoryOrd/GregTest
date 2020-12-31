@@ -4,12 +4,13 @@
 #include "TestMainWriter.h"
 #include "TestAndSrcDefinitions.h"
 
-void initTestCases(TestCaseList* testCases)
+void initTestFiles(TestFileList* testFiles)
 {
-    testCases->size = 0;
-    testCases->cases = (TestCase*)malloc(sizeof(TestCase));
-    testCases->cases[0].testFile = NULL;
-    testCases->cases[0].testName = NULL; 
+    testFiles->size = 0;
+    testFiles->files = (TestFile*)malloc(sizeof(TestFile));
+    testFiles->files[0].name = NULL;
+    testFiles->files[0].numTestCases = 0;
+    testFiles->files[0].cases = (TestCase*)malloc(sizeof(TestCase));
 }
 
 void initSourceFiles(SourceFileList* sourceFiles)
@@ -19,7 +20,7 @@ void initSourceFiles(SourceFileList* sourceFiles)
     sourceFiles->files[0].name = NULL;
 }
 
-void loadTestsAndSourceFiles(TestCaseList* testCases, SourceFileList* sourceFiles, char* basePath)
+void loadTestsAndSourceFiles(TestFileList* testFiles, SourceFileList* sourceFiles, char* basePath)
 {
     char* fileOrSubDirectoryFullPath = (char*)malloc(WINDOWS_MAX_PATH_LENGTH * sizeof(char*));
     struct dirent *fileOrSubDirectory;
@@ -33,18 +34,18 @@ void loadTestsAndSourceFiles(TestCaseList* testCases, SourceFileList* sourceFile
     while ((fileOrSubDirectory = readdir(basePathDirectory)) != NULL)
     {
         copyFileOrSubDirectoryNameIntoPath(fileOrSubDirectoryFullPath, basePath, fileOrSubDirectory->d_name);
-        addToListOrEnterSubDirectoryForRecursion(testCases, sourceFiles, basePath, fileOrSubDirectory, fileOrSubDirectoryFullPath);
+        addToListOrEnterSubDirectoryForRecursion(testFiles, sourceFiles, basePath, fileOrSubDirectory, fileOrSubDirectoryFullPath);
     }
 
     closedir(basePathDirectory);
     free(fileOrSubDirectoryFullPath);
 }
 
-void addToListOrEnterSubDirectoryForRecursion(TestCaseList* testCases, SourceFileList* sourceFiles, char* basePath, struct dirent *fileOrSubDirectory, char* fileOrSubDirectoryFullPath)
+void addToListOrEnterSubDirectoryForRecursion(TestFileList* testFiles, SourceFileList* sourceFiles, char* basePath, struct dirent *fileOrSubDirectory, char* fileOrSubDirectoryFullPath)
 {
     if(isTestDir(basePath) && isTestFile(fileOrSubDirectory))
     {
-        addTestCasesToList(testCases, fileOrSubDirectoryFullPath);
+        addTestFileToList(testFiles, fileOrSubDirectoryFullPath);
     }
     else if(!isVisibleDirectory(fileOrSubDirectory) && isSourceFile(fileOrSubDirectory))
     {
@@ -52,7 +53,7 @@ void addToListOrEnterSubDirectoryForRecursion(TestCaseList* testCases, SourceFil
     }
     else if(isVisibleDirectory(fileOrSubDirectory))
     {
-        loadTestsAndSourceFiles(testCases, sourceFiles, fileOrSubDirectoryFullPath);
+        loadTestsAndSourceFiles(testFiles, sourceFiles, fileOrSubDirectoryFullPath);
     }
 }
 
@@ -71,14 +72,21 @@ void copyFileOrSubDirectoryNameIntoPath(char* path, char* basePath, char* fileOr
     strcat(path, fileOrSubDirectoryName);  
 }
 
-void freeTestCasesList(TestCaseList* list)
+void freeTestFileList(TestFileList* testFileList)
 {
-    for(int i = 0; i < list->size; i++)
+    for(int fileIndex = 0; fileIndex < testFileList->size; fileIndex++)
     {
-        free(list->cases[i].testFile);
-        free(list->cases[i].testName);
+        TestFile* testFile = &testFileList->files[fileIndex];
+        free(testFile->name);
+        for(int testCaseIndex = 0; testCaseIndex < testFile->numTestCases; testCaseIndex++)
+        {
+            TestCase* testCase = &testFile->cases[testCaseIndex];
+            free(testCase->testName);
+        }
+        free(testFile->cases);
     }
-    free(list);
+    free(testFileList->files);
+    free(testFileList);
 }
 
 void freeSourceFileList(SourceFileList* list)
@@ -91,24 +99,6 @@ void freeSourceFileList(SourceFileList* list)
 }
 
 
-void addTestCasesToList(TestCaseList* list, const char* pathToTestFile)
-{
-    FILE *testFile;
-    char* buffer = (char*)malloc(255*sizeof(char));
-    testFile = fopen(pathToTestFile, "r");
-
-    while(fgets(buffer, 255, (FILE*)testFile) != NULL)
-    {
-        if(isTestCaseDefinition(buffer))
-        {
-            addSingleTestCaseToList(list, pathToTestFile, buffer);
-        }  
-    }
-
-    free(buffer);
-    fclose(testFile);
-}
-
 void addSourceFileToList(SourceFileList* list, const char* pathToSourceFile)
 {
     list->files = (SourceFile*)realloc(list->files, ((list->size + 1) * sizeof(SourceFile)));
@@ -117,15 +107,46 @@ void addSourceFileToList(SourceFileList* list, const char* pathToSourceFile)
     list->size++; 
 }
 
-void addSingleTestCaseToList(TestCaseList* list, const char* pathToTestFile, char* buffer)
+void addTestFileToList(TestFileList* testFileList, const char* pathToTestFile)
 {
-    list->cases = (TestCase*)realloc(list->cases, ((list->size + 1) * sizeof(TestCase)));
-    list->cases[list->size].testName = (char*)malloc(WINDOWS_MAX_PATH_LENGTH * sizeof(char*));
-    list->cases[list->size].testFile = (char*)malloc(WINDOWS_MAX_PATH_LENGTH * sizeof(char*)); 
+    testFileList->files = (TestFile*)realloc(testFileList->files, (testFileList->size + 1) * sizeof(TestFile));
+    testFileList->files[testFileList->size].name = (char*)malloc(WINDOWS_MAX_PATH_LENGTH * sizeof(char*));
+    testFileList->files[testFileList->size].numTestCases = 0;
+    testFileList->files[testFileList->size].cases = (TestCase*)malloc(sizeof(TestCase));
+    strcpy(testFileList->files[testFileList->size].name, pathToTestFile);
+
+    addTestCasesToList(testFileList, pathToTestFile);
+
+    testFileList->size++;
+}
+
+void addTestCasesToList(TestFileList* testFileList, const char* pathToTestFile)
+{
+    FILE *testFilePtr;
+    char* buffer = (char*)malloc(255*sizeof(char));
+    testFilePtr = fopen(pathToTestFile, "r");
+
+    while(fgets(buffer, 255, (FILE*)testFilePtr) != NULL)
+    {
+        if(isTestCaseDefinition(buffer))
+        {
+            addSingleTestCaseToList(testFileList, pathToTestFile, buffer);
+        }  
+    }
+
+    free(buffer);
+    fclose(testFilePtr);
+}
+
+void addSingleTestCaseToList(TestFileList* testFileList, const char* pathToTestFile, char* buffer)
+{
+    TestFile* testFile = &testFileList->files[testFileList->size];
+    testFile->cases = (TestCase*)realloc(testFile->cases, ((testFile->numTestCases + 1) * sizeof(TestCase)));
+    testFile->cases[testFile->numTestCases].testName = (char*)malloc(WINDOWS_MAX_PATH_LENGTH * sizeof(char*));
 
     trimTestName(buffer); 
 
-    strcpy(list->cases[list->size].testName, buffer);
-    strcpy(list->cases[list->size].testFile, pathToTestFile);
-    list->size++;
+    strcpy(testFile->cases[testFile->numTestCases].testName, buffer);
+    testFile->numTestCases++;
+    testFileList->totalNumTestCases++;
 }

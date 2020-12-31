@@ -6,13 +6,20 @@
 typedef struct TestCase
 {
     char* testName;
-    char* testFile;
 } TestCase;
 
-typedef struct TestCaseList
+typedef struct TestFile
+{
+    char* name;
+    int numTestCases;
+    TestCase* cases;
+} TestFile;
+
+typedef struct TestFileList
 {
     int size;
-    TestCase* cases;
-} TestCaseList;
+    int totalNumTestCases;
+    TestFile* files;
+} TestFileList;
 
 #endif
