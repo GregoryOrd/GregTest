@@ -30,7 +30,7 @@ int main()
 
     makeDir(TEMP_DIR);
     runTestGatherer(testCases, sourceFiles);
-    compileIntoTempObjectFiles();
+    compileIntoTempObjectFiles(testCases, sourceFiles);
     linkObjectFilesWithGregTestDllToMakeProjectTestDll();
     createTestMainExecutableFromProjectDllAndGregTestDll();
     int testResults = runTests();
@@ -90,14 +90,51 @@ void printTestCaseList(const TestCaseList* list)
     printf("====================================\n");
 }
 
-void compileIntoTempObjectFiles()
+int numTestFiles(TestCaseList* testCases)
 {
-    char * const argv[] = {gcc, "-c", "src/HelloWorld/testHelloWorld/TestHelloWorld.c",
-    "src/HelloWorld/testHelloWorld/TestHelloWorld2.c", "src/HelloWorld/HelloWorld.c", NULL};
+    return 2;
+}
+
+void compileIntoTempObjectFiles(TestCaseList* testCases, SourceFileList* sourceFiles)
+{
+    // char * const argv[] = {gcc, "-c", "src/HelloWorld/testHelloWorld/TestHelloWorld.c",
+    // "src/HelloWorld/testHelloWorld/TestHelloWorld2.c", "src/HelloWorld/HelloWorld.c", NULL};
+
+    int numGccArgs = numTestFiles(testCases) + sourceFiles->size + 3;
+    int numMvArgs = numGccArgs - 1;
+
+    char ** argv = malloc(numGccArgs * sizeof(char*));
+    populateArgsFor_compileIntoTempObjectFiles(argv, testCases, sourceFiles, numGccArgs);
     forkAndRunChildProcess(gcc, argv);
 
     char* const argv2[] = {mv, "HelloWorld.o", "TestHelloWorld.o", "TestHelloWorld2.o", TEMP_DIR, NULL};
     forkAndRunChildProcess(mv, argv2);
+
+    free(argv);
+}
+
+void populateArgsFor_compileIntoTempObjectFiles(char** argv, TestCaseList* testCases, SourceFileList* sourceFiles, int numGccArgs)
+{
+    argv[0] = gcc;
+    argv[1] = "-c";
+
+    int argIndex = 2;
+    int testCaseIndex = 0;
+    int sourceFileIndex = 0;
+    while(testCaseIndex < testCases->size)
+    {
+        argv[argIndex] = testCases->cases[testCaseIndex].testFile;
+        argIndex++;
+        testCaseIndex++;
+    }
+
+    while(sourceFileIndex < sourceFiles->size)
+    {
+        argv[argIndex] = sourceFiles->files[sourceFileIndex].name;
+        argIndex++;
+        sourceFileIndex++;
+    }
+    argv[numGccArgs-1] = NULL;
 }
 
 void linkObjectFilesWithGregTestDllToMakeProjectTestDll()
