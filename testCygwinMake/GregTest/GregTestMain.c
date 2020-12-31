@@ -87,43 +87,6 @@ void runTestGatherer(TestFileList* testFiles, SourceFileList* sourceFiles)
 
     loadTestsAndSourceFiles(testFiles, sourceFiles, startingDirectory);
     writeTestsToTestMain(testFiles);
-
-    for(int testFileIndex = 0; testFileIndex < testFiles->size; testFileIndex++)
-    {
-        printTestCases(&testFiles->files[testFileIndex]);
-    }
-    printSourceFiles(sourceFiles);
-    printTestFiles(testFiles);
-}
-
-void printSourceFiles(const SourceFileList* list)
-{
-    printf("====================================\n");
-    for(int i = 0; i < list->size; i++)
-    {
-        printf("Source File: %s\n", list->files[i].name);
-    }  
-    printf("====================================\n");  
-}
-
-void printTestCases(const TestFile* file)
-{
-    printf("====================================\n");
-    for(int i = 0; i < file->numTestCases; i++)
-    {
-        printf("file: %s || testCase: %s\n", file->name, file->cases[i].testName);
-    }  
-    printf("====================================\n");
-}
-
-void printTestFiles(const TestFileList* list)
-{
-    printf("====================================\n");
-    for(int i = 0; i < list->size; i++)
-    {
-        printf("Test File: %s\n", list->files[i].name);
-    }  
-    printf("====================================\n");    
 }
 
 void compileIntoTempObjectFiles(TestFileList* testFiles, SourceFileList* sourceFiles)
