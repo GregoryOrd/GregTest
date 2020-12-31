@@ -24,8 +24,7 @@ bool isTestFile(struct dirent *fileOrSubDirectory)
 bool isSourceFile(struct dirent *fileOrSubDirectory)
 {
     char lower[WINDOWS_MAX_PATH_LENGTH];
-    lowerString(lower, fileOrSubDirectory->d_name);
-    bool result = (strncmp(lower, "test", 4) != 0 && (strstr(lower, ".c") != NULL || strstr(lower, ".cpp") != NULL));
+    bool result = (strncmp(fileOrSubDirectory->d_name, "test", 4) != 0 && (strstr(fileOrSubDirectory->d_name, ".c") != NULL || strstr(fileOrSubDirectory->d_name, ".cpp") != NULL));
     return result;
 }
 

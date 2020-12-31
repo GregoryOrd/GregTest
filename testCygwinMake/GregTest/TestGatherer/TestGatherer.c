@@ -1,8 +1,8 @@
 #include "TestGatherer.h"
 
 #include <ctype.h>
-#include "TestDefinitions.h"
 #include "TestMainWriter.h"
+#include "TestAndSrcDefinitions.h"
 
 void initTestCases(TestCaseList* testCases)
 {
@@ -19,7 +19,7 @@ void initSourceFiles(SourceFileList* sourceFiles)
     sourceFiles->files[0].name = NULL;
 }
 
-void loadTests(TestCaseList* testCases, SourceFileList* sourceFiles, char* basePath)
+void loadTestsAndSourceFiles(TestCaseList* testCases, SourceFileList* sourceFiles, char* basePath)
 {
     char* fileOrSubDirectoryFullPath = (char*)malloc(WINDOWS_MAX_PATH_LENGTH * sizeof(char*));
     struct dirent *fileOrSubDirectory;
@@ -33,28 +33,35 @@ void loadTests(TestCaseList* testCases, SourceFileList* sourceFiles, char* baseP
     while ((fileOrSubDirectory = readdir(basePathDirectory)) != NULL)
     {
         copyFileOrSubDirectoryNameIntoPath(fileOrSubDirectoryFullPath, basePath, fileOrSubDirectory->d_name);
-        addTestCasesOrEnterSubDirectoryForRecursion(testCases, sourceFiles, basePath, fileOrSubDirectory, fileOrSubDirectoryFullPath);
+        addToListOrEnterSubDirectoryForRecursion(testCases, sourceFiles, basePath, fileOrSubDirectory, fileOrSubDirectoryFullPath);
     }
 
     closedir(basePathDirectory);
     free(fileOrSubDirectoryFullPath);
 }
 
-void addTestCasesOrEnterSubDirectoryForRecursion(TestCaseList* testCases, SourceFileList* sourceFiles, char* basePath, struct dirent *fileOrSubDirectory, char* fileOrSubDirectoryFullPath)
+void addToListOrEnterSubDirectoryForRecursion(TestCaseList* testCases, SourceFileList* sourceFiles, char* basePath, struct dirent *fileOrSubDirectory, char* fileOrSubDirectoryFullPath)
 {
     if(isTestDir(basePath) && isTestFile(fileOrSubDirectory))
     {
         addTestCasesToList(testCases, fileOrSubDirectoryFullPath);
     }
-    if (isDirectory(fileOrSubDirectory))
+    else if(!isVisibleDirectory(fileOrSubDirectory) && isSourceFile(fileOrSubDirectory))
     {
-        loadTests(testCases, sourceFiles, fileOrSubDirectoryFullPath);
+        printf("Found a Source File: %s\n", fileOrSubDirectoryFullPath);
+    }
+    else if(isVisibleDirectory(fileOrSubDirectory))
+    {
+        loadTestsAndSourceFiles(testCases, sourceFiles, fileOrSubDirectoryFullPath);
     }
 }
 
-bool isDirectory(struct dirent *fileOrSubDirectory)
+bool isVisibleDirectory(struct dirent *fileOrSubDirectory)
 {
-    return strncmp(fileOrSubDirectory->d_name, ".", 1) != 0 && fileOrSubDirectory->d_type == DT_DIR;
+    bool dirNameStartsWithDot = strncmp(fileOrSubDirectory->d_name, ".", 1) == 0;
+    bool dirNameContainsSlashDot = strstr(fileOrSubDirectory->d_name, "/.") != NULL;
+    bool isHiddenDirectory = dirNameStartsWithDot || dirNameContainsSlashDot;
+    return !isHiddenDirectory && fileOrSubDirectory->d_type == DT_DIR;
 }
 
 void copyFileOrSubDirectoryNameIntoPath(char* path, char* basePath, char* fileOrSubDirectoryName)

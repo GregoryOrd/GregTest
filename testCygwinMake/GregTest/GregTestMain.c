@@ -63,7 +63,7 @@ void runTestGatherer(TestCaseList* testCases, SourceFileList* sourceFiles)
 {
     char startingDirectory[WINDOWS_MAX_PATH_LENGTH] = SRC_DIR;
 
-    loadTests(testCases, sourceFiles, startingDirectory);
+    loadTestsAndSourceFiles(testCases, sourceFiles, startingDirectory);
     writeTestsToTestMain(testCases);
 
     printTestCaseList(testCases);
