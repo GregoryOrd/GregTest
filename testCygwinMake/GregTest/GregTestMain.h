@@ -3,6 +3,7 @@
 
 #include "TestGatherer/TestStructureDefs.h"
 #include "TestGatherer/SourceFileStructureDefs.h"
+#include "ArgListDefs.h"
 
 void makeDir(char* dirName);
 void runTestGatherer(TestFileList* testFiles, SourceFileList* sourceFiles);
@@ -11,15 +12,19 @@ void initFileListsAndTempDir(TestFileList* testFiles, SourceFileList* sourceFile
 void createTestMainExecutable(TestFileList* testFiles, SourceFileList* sourceFiles);
 void removeTempDirAndFreeFileLists(TestFileList* testFiles, SourceFileList* sourceFiles);
 void compileIntoTempObjectFiles(TestFileList* testCases, SourceFileList* sourceFiles);
-void populateArgsFor_compileIntoTempObjectFiles(char** argv, TestFileList* testCases, SourceFileList* sourceFiles, int numGccArgs);
+void populateArgsFor_compileIntoTempObjectFiles(ArgList* gccArgs, ArgList* mvArgs, TestFileList* testCases, SourceFileList* sourceFiles);
 void linkObjectFilesWithGregTestDllToMakeProjectTestDll();
 void createTestMainExecutableFromProjectDllAndGregTestDll();
 int runTests();
+void determineObjectFileName(char* objectFileName, const char* filePath);
 int compileObjectFilesIntoProjectExecutable();
 void changeDirectory(char* dirToMoveTo);
 void copyTestProjectDllIntoTopLevelDir();
 void copyGregTestDllIntoTopLevelDir();
+void reverseFileName(char* dest, char* src);
 void removeFolder(char* folderName);
+void clearString(char* str);
+void freeArgList(ArgList* argList);
 int forkAndRunChildProcess(const char * pathToExecutable, char * const argv[]);
 
 #endif

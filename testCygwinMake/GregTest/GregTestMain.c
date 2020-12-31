@@ -91,44 +91,123 @@ void runTestGatherer(TestFileList* testFiles, SourceFileList* sourceFiles)
 
 void compileIntoTempObjectFiles(TestFileList* testFiles, SourceFileList* sourceFiles)
 {
-    // char * const argv[] = {gcc, "-c", "src/HelloWorld/testHelloWorld/TestHelloWorld.c",
-    // "src/HelloWorld/testHelloWorld/TestHelloWorld2.c", "src/HelloWorld/HelloWorld.c", NULL};
+    ArgList* gccArgs = (ArgList*)malloc(sizeof(ArgList));
+    gccArgs->size = testFiles->size + sourceFiles->size + 3;
+    gccArgs->args = (char**)malloc(gccArgs->size * sizeof(char*));
 
-    int numGccArgs = testFiles->size + sourceFiles->size + 3;
-    int numMvArgs = numGccArgs - 1;
+    ArgList* mvArgs = (ArgList*)malloc(sizeof(ArgList));
+    mvArgs->size = testFiles->size + sourceFiles->size + 3;
+    mvArgs->args = (char**)malloc(mvArgs->size * sizeof(char*));
 
-    char ** argv = malloc(numGccArgs * sizeof(char*));
-    populateArgsFor_compileIntoTempObjectFiles(argv, testFiles, sourceFiles, numGccArgs);
-    forkAndRunChildProcess(gcc, argv);
+    populateArgsFor_compileIntoTempObjectFiles(gccArgs, mvArgs, testFiles, sourceFiles);
+    forkAndRunChildProcess(gcc, gccArgs->args);
+    forkAndRunChildProcess(mv, mvArgs->args);
 
-    char* const argv2[] = {mv, "HelloWorld.o", "TestHelloWorld.o", "TestHelloWorld2.o", TEMP_DIR, NULL};
-    forkAndRunChildProcess(mv, argv2);
-
-    free(argv);
+    freeArgList(gccArgs);
+    free(mvArgs);
 }
 
-void populateArgsFor_compileIntoTempObjectFiles(char** argv, TestFileList* testFiles, SourceFileList* sourceFiles, int numGccArgs)
+void freeArgList(ArgList* argList)
 {
-    argv[0] = gcc;
-    argv[1] = "-c";
+    free(argList->args);
+    free(argList);
+}
 
-    int argIndex = 2;
+void populateArgsFor_compileIntoTempObjectFiles(ArgList* gccArgs, ArgList* mvArgs, TestFileList* testFiles, SourceFileList* sourceFiles)
+{
+    gccArgs->args[0] = gcc;
+    gccArgs->args[1] = "-c";
+
+    mvArgs->args[0] = mv;
+    int gccFileArgOffset = 2;
+    int mvFileArgOffset = 1;
+
+    int argIndex = 0;
     int testFileIndex = 0;
     int sourceFileIndex = 0;
+
+    char* objectFileName = (char*)malloc(WINDOWS_MAX_PATH_LENGTH * sizeof(char));
+
     while(testFileIndex < testFiles->size)
     {
-        argv[argIndex] = testFiles->files[testFileIndex].name;
+        clearString(objectFileName);
+        determineObjectFileName(objectFileName, testFiles->files[testFileIndex].name);
+        gccArgs->args[argIndex + gccFileArgOffset] = testFiles->files[testFileIndex].name;
+        mvArgs->args[argIndex + mvFileArgOffset] = (char*)malloc(strlen(objectFileName) * sizeof(char));
+        strcpy(mvArgs->args[argIndex + mvFileArgOffset], objectFileName);
         argIndex++;
         testFileIndex++;
     }
 
     while(sourceFileIndex < sourceFiles->size)
     {
-        argv[argIndex] = sourceFiles->files[sourceFileIndex].name;
+        clearString(objectFileName);
+        determineObjectFileName(objectFileName, sourceFiles->files[sourceFileIndex].name);
+        gccArgs->args[argIndex + gccFileArgOffset] = sourceFiles->files[sourceFileIndex].name;
+        mvArgs->args[argIndex + mvFileArgOffset] = (char*)malloc(strlen(objectFileName) * sizeof(char));
+        strcpy(mvArgs->args[argIndex + mvFileArgOffset], objectFileName);
         argIndex++;
         sourceFileIndex++;
     }
-    argv[numGccArgs-1] = NULL;
+    gccArgs->args[gccArgs->size-1] = NULL;
+    mvArgs->args[mvArgs->size-2] = TEMP_DIR;
+    mvArgs->args[mvArgs->size-1] = NULL;
+
+    free(objectFileName);
+}
+
+void clearString(char* str)
+{
+    int length = strlen(str);
+    for(int i = 0; i < length - 1; i++)
+    {
+        str[i] = '\0';
+    }
+}
+
+void determineObjectFileName(char* objectFileName, const char* filePath)
+{
+    int length = strlen(filePath) - 1;
+    int offset = 2;
+    char* reversedObjectFileName = (char*)malloc(length * sizeof(char));
+    reversedObjectFileName[0] = 'o';
+    reversedObjectFileName[1] = '.';
+    bool pastExtension = false;
+
+    for(int i = length - 1; i > 0; i--)
+    {
+        if(filePath[i] == '\\' || filePath[i] == '/')
+        {
+            break;
+        }
+        else if(filePath[i] != '.')
+        {
+            reversedObjectFileName[offset] = filePath[i];
+            reversedObjectFileName[offset + 1] = '\0';
+            offset++;
+        }
+        else if(filePath[i] == '.')
+        {
+            pastExtension = true;
+        }
+    }
+    reverseFileName(objectFileName, reversedObjectFileName);
+    free(reversedObjectFileName);
+}
+
+void reverseFileName(char* dest, char* src)
+{
+    int srcLength = strlen(src);
+    int countUp = 0;
+    for(int i = srcLength - 1; i >= 0; i--)
+    {
+        if(src[i] != '\0')
+        {
+            dest[countUp] = src[i];
+            countUp++;
+        }
+    }
+    dest[countUp] = '\0';
 }
 
 void linkObjectFilesWithGregTestDllToMakeProjectTestDll()
