@@ -67,6 +67,17 @@ void runTestGatherer(TestCaseList* testCases, SourceFileList* sourceFiles)
     writeTestsToTestMain(testCases);
 
     printTestCaseList(testCases);
+    printSourceFiles(sourceFiles);
+}
+
+void printSourceFiles(const SourceFileList* list)
+{
+    printf("====================================\n");
+    for(int i = 0; i < list->size; i++)
+    {
+        printf("Source File: %s\n", list->files[i].name);
+    }  
+    printf("====================================\n");  
 }
 
 void printTestCaseList(const TestCaseList* list)

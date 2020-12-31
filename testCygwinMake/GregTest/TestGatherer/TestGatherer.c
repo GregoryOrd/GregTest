@@ -48,7 +48,7 @@ void addToListOrEnterSubDirectoryForRecursion(TestCaseList* testCases, SourceFil
     }
     else if(!isVisibleDirectory(fileOrSubDirectory) && isSourceFile(fileOrSubDirectory))
     {
-        printf("Found a Source File: %s\n", fileOrSubDirectoryFullPath);
+        addSourceFileToList(sourceFiles, fileOrSubDirectoryFullPath);
     }
     else if(isVisibleDirectory(fileOrSubDirectory))
     {
@@ -107,6 +107,14 @@ void addTestCasesToList(TestCaseList* list, const char* pathToTestFile)
 
     free(buffer);
     fclose(testFile);
+}
+
+void addSourceFileToList(SourceFileList* list, const char* pathToSourceFile)
+{
+    list->files = (SourceFile*)realloc(list->files, ((list->size + 1) * sizeof(SourceFile)));
+    list->files[list->size].name = (char*)malloc(WINDOWS_MAX_PATH_LENGTH * sizeof(char*));; 
+    strcpy(list->files[list->size].name, pathToSourceFile);
+    list->size++; 
 }
 
 void addSingleTestCaseToList(TestCaseList* list, const char* pathToTestFile, char* buffer)

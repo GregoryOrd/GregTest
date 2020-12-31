@@ -12,6 +12,7 @@ void loadTestsAndSourceFiles(TestCaseList* testCases, SourceFileList* sourceFile
 void addToListOrEnterSubDirectoryForRecursion(TestCaseList* testCases, SourceFileList* sourceFiles, char* basePath, struct dirent *fileOrSubDirectory, char* fileOrSubDirectoryFullPath);
 void copyFileOrSubDirectoryNameIntoPath(char* path, char* basePath, char* fileOrSubDirectoryName);
 void addTestCasesToList(TestCaseList* list, const char* pathToTestFile);
+void addSourceFileToList(SourceFileList* list, const char* pathToSourceFile);
 void addSingleTestCaseToList(TestCaseList* list, const char* pathToTestFile, char* buffer);
 void freeTestCasesList(TestCaseList* list);
 void freeSourceFileList(SourceFileList* list);

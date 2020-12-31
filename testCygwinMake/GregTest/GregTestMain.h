@@ -7,6 +7,7 @@
 void makeDir(char* dirName);
 void runTestGatherer(TestCaseList* testCases, SourceFileList* sourceFiles);
 void printTestCaseList(const TestCaseList* list);
+void printSourceFiles(const SourceFileList* list);
 void compileIntoTempObjectFiles();
 void linkObjectFilesWithGregTestDllToMakeProjectTestDll();
 void createTestMainExecutableFromProjectDllAndGregTestDll();
