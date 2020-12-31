@@ -1,6 +1,7 @@
 #include "GregTestMain.h"
 
 #include "TestGatherer/TestGatherer.h"
+#include "GregTestConstants.h"
 #include "TestGatherer/TestMainWriter.h"
 #include "CommandLineExecutables.h"
 #include <stdio.h>
@@ -20,7 +21,7 @@
 int main()
 {
     int retval = 1;
-    makeDir("temp");
+    makeDir(TEMP_DIR);
     runTestGatherer();
     compileIntoTempObjectFiles();
     linkObjectFilesWithGregTestDllToMakeProjectTestDll();
@@ -28,7 +29,6 @@ int main()
     int testResults = runTests();
     if(!testResults)
     {
-        //Tests Passed
         if(!compileObjectFilesIntoProjectExecutable())
         {
             printf("Build Successful!\n");
@@ -40,7 +40,7 @@ int main()
         
         retval = 0;
     }
-    removeFolder("temp");
+    removeFolder(TEMP_DIR);
     return retval;
 }
 
@@ -52,7 +52,7 @@ void makeDir(char* dirName)
 
 void runTestGatherer()
 {
-    char startingDirectory[WINDOWS_MAX_PATH_LENGTH] = "src";
+    char startingDirectory[WINDOWS_MAX_PATH_LENGTH] = SRC_DIR;
 
     TestCaseList* testCases = (TestCaseList*)malloc(sizeof(TestCaseList));
     initTestCases(testCases);
@@ -75,33 +75,32 @@ void compileIntoTempObjectFiles()
 
 void linkObjectFilesWithGregTestDllToMakeProjectTestDll()
 {
-    char * const argv[] = {gcc, "-shared", "-o", "temp/TestProject.dll",
-    "temp/TestHelloWorld.o", "temp/TestHelloWorld2.o", "temp/HelloWorld.o", "-L./", "lib/GregTest.dll", NULL};
+    char * const argv[] = {gcc, "-shared", "-o", TEMP_TEST_PROJECT_DLL, 
+    "temp/TestHelloWorld.o", "temp/TestHelloWorld2.o", "temp/HelloWorld.o", "-L./", LIB_GREG_TEST_DLL, NULL};
     forkAndRunChildProcess(gcc, argv);
 }
 
 void createTestMainExecutableFromProjectDllAndGregTestDll()
 {
-    char * const argv[] = {gcc, "-o", "temp/TestMain",
-    "temp/TestMain.c", "-L./", "temp/TestProject.dll", "lib/GregTest.dll", NULL};
+    char * const argv[] = {gcc, "-o", TEMP_TEST_MAIN, TEMP_TEST_MAIN_C, "-L./", TEMP_TEST_PROJECT_DLL, LIB_GREG_TEST_DLL, NULL};
     forkAndRunChildProcess(gcc, argv); 
 }
 
 int runTests()
 { 
-    char * const argv[] = {cp, "temp/TestProject.dll", ".", NULL};
+    char * const argv[] = {cp, TEMP_TEST_PROJECT_DLL, CURRENT_DIR, NULL};
     forkAndRunChildProcess(cp, argv);
 
-    char * const argv1[] = {cp, "lib/GregTest.dll", ".", NULL};
+    char * const argv1[] = {cp, LIB_GREG_TEST_DLL, CURRENT_DIR, NULL};
     forkAndRunChildProcess(cp, argv1);
 
-    char * const argv2[] = {"temp/TestMain.exe", NULL};
-    int testResult = forkAndRunChildProcess("temp/TestMain.exe", argv2); 
+    char * const argv2[] = {TEMP_TEST_MAIN_EXE, NULL};
+    int testResult = forkAndRunChildProcess(TEMP_TEST_MAIN_EXE, argv2); 
 
-    char * const argv3[] = {rm, "GregTest.dll", NULL};
+    char * const argv3[] = {rm, GREG_TEST_DLL, NULL};
     forkAndRunChildProcess(rm, argv3); 
 
-    char * const argv4[] = {rm, "TestProject.dll", NULL};
+    char * const argv4[] = {rm, TEST_PROJECT_DLL, NULL};
     forkAndRunChildProcess(rm, argv4); 
 
     return testResult;
@@ -109,7 +108,7 @@ int runTests()
 
 int compileObjectFilesIntoProjectExecutable()
 {
-    char * const argv[] = {gcc, "temp/HelloWorld.o", "-o", "dist/HelloWorld.exe", NULL};
+    char * const argv[] = {gcc, "temp/HelloWorld.o", "-o", PROJECT_EXE, NULL};
     forkAndRunChildProcess(gcc, argv);   
 }
 

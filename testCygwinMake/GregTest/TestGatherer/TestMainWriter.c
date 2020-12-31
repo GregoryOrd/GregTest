@@ -1,5 +1,7 @@
 #include "TestMainWriter.h"
 
+#include "../GregTestConstants.h"
+
 void writeTestsToTestMain(TestCaseList* testCaseList)
 {
     int numTests = testCaseList->size;
@@ -14,7 +16,9 @@ void writeToTestMainC(int numTests, TestCase* cases)
     char contents[size];
     contents[0] = '\0';
     populateTestMainCContents(contents, numTests, cases);
-    writeToFile("C:/GregTest/testCygwinMake/temp/TestMain.c", contents);
+    char testMainC[WINDOWS_MAX_PATH_LENGTH] = TEMP_DIR;
+    strcat(testMainC, "/TestMain.c");
+    writeToFile(testMainC, contents);
 }
 
 void populateTestMainCContents(char* contents, int numTests, TestCase* cases)
@@ -84,7 +88,9 @@ void writeToTestMainH(int numTests, TestCase* cases)
     writeTestMainHGregTestDllImports(contents);
     writeTestMainHTestCaseDllImports(contents, numTests, cases);
     writeTestMainHEnd(contents);
-    writeToFile("C:/GregTest/testCygwinMake/temp/TestMain.h", contents);
+    char testMainH[WINDOWS_MAX_PATH_LENGTH] = TEMP_DIR;
+    strcat(testMainH, "/TestMain.h");
+    writeToFile(testMainH, contents);
 }
 
 void writeTestMainHGuardsAndDllDefine(char* contents)
