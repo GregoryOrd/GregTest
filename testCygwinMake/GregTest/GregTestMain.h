@@ -15,6 +15,8 @@ void compileIntoTempObjectFiles(TestFileList* testCases, SourceFileList* sourceF
 void populateArgsFor_compileIntoTempObjectFiles(ArgList* gccArgs, ArgList* mvArgs, TestFileList* testCases, SourceFileList* sourceFiles);
 void linkObjectFilesWithGregTestDllToMakeProjectTestDll();
 void createTestMainExecutableFromProjectDllAndGregTestDll();
+void getArgsForTestFiles(int* argIndex, TestFileList* testFiles, ArgList* gccArgs, ArgList* mvArgs);
+void getArgsForSourceFiles(int* argIndex, SourceFileList* sourceFiles, ArgList* gccArgs, ArgList* mvArgs);
 int runTests();
 void determineObjectFileName(char* objectFileName, const char* filePath);
 int compileObjectFilesIntoProjectExecutable();

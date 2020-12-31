@@ -117,42 +117,52 @@ void populateArgsFor_compileIntoTempObjectFiles(ArgList* gccArgs, ArgList* mvArg
 {
     gccArgs->args[0] = gcc;
     gccArgs->args[1] = "-c";
+    gccArgs->args[gccArgs->size-1] = NULL;
 
     mvArgs->args[0] = mv;
-    int gccFileArgOffset = 2;
-    int mvFileArgOffset = 1;
+    mvArgs->args[mvArgs->size-2] = TEMP_DIR;
+    mvArgs->args[mvArgs->size-1] = NULL;
 
     int argIndex = 0;
-    int testFileIndex = 0;
-    int sourceFileIndex = 0;
+    getArgsForTestFiles(&argIndex, testFiles, gccArgs, mvArgs);
+    getArgsForSourceFiles(&argIndex, sourceFiles, gccArgs, mvArgs);
+}
 
+void getArgsForTestFiles(int* argIndex, TestFileList* testFiles, ArgList* gccArgs, ArgList* mvArgs)
+{
     char* objectFileName = (char*)malloc(WINDOWS_MAX_PATH_LENGTH * sizeof(char));
-
+    int gccFileArgOffset = 2;
+    int mvFileArgOffset = 1;
+    int testFileIndex = 0;
     while(testFileIndex < testFiles->size)
     {
         clearString(objectFileName);
         determineObjectFileName(objectFileName, testFiles->files[testFileIndex].name);
-        gccArgs->args[argIndex + gccFileArgOffset] = testFiles->files[testFileIndex].name;
-        mvArgs->args[argIndex + mvFileArgOffset] = (char*)malloc(strlen(objectFileName) * sizeof(char));
-        strcpy(mvArgs->args[argIndex + mvFileArgOffset], objectFileName);
-        argIndex++;
+        gccArgs->args[*argIndex + gccFileArgOffset] = testFiles->files[testFileIndex].name;
+        mvArgs->args[*argIndex + mvFileArgOffset] = (char*)malloc(strlen(objectFileName) * sizeof(char));
+        strcpy(mvArgs->args[*argIndex + mvFileArgOffset], objectFileName);
+        (*argIndex)++;
         testFileIndex++;
-    }
+    } 
+    free(objectFileName);
+}
 
+void getArgsForSourceFiles(int* argIndex, SourceFileList* sourceFiles, ArgList* gccArgs, ArgList* mvArgs)
+{
+    char* objectFileName = (char*)malloc(WINDOWS_MAX_PATH_LENGTH * sizeof(char));
+    int gccFileArgOffset = 2;
+    int mvFileArgOffset = 1;
+    int sourceFileIndex = 0;
     while(sourceFileIndex < sourceFiles->size)
     {
         clearString(objectFileName);
         determineObjectFileName(objectFileName, sourceFiles->files[sourceFileIndex].name);
-        gccArgs->args[argIndex + gccFileArgOffset] = sourceFiles->files[sourceFileIndex].name;
-        mvArgs->args[argIndex + mvFileArgOffset] = (char*)malloc(strlen(objectFileName) * sizeof(char));
-        strcpy(mvArgs->args[argIndex + mvFileArgOffset], objectFileName);
-        argIndex++;
+        gccArgs->args[*argIndex + gccFileArgOffset] = sourceFiles->files[sourceFileIndex].name;
+        mvArgs->args[*argIndex + mvFileArgOffset] = (char*)malloc(strlen(objectFileName) * sizeof(char));
+        strcpy(mvArgs->args[*argIndex + mvFileArgOffset], objectFileName);
+        (*argIndex)++;
         sourceFileIndex++;
     }
-    gccArgs->args[gccArgs->size-1] = NULL;
-    mvArgs->args[mvArgs->size-2] = TEMP_DIR;
-    mvArgs->args[mvArgs->size-1] = NULL;
-
     free(objectFileName);
 }
 
