@@ -21,8 +21,15 @@
 int main()
 {
     int retval = 1;
+
+    TestCaseList* testCases = (TestCaseList*)malloc(sizeof(TestCaseList));
+    initTestCases(testCases);
+
+    SourceFileList* sourceFiles = (SourceFileList*)malloc(sizeof(SourceFileList));
+    initSourceFiles(sourceFiles);
+
     makeDir(TEMP_DIR);
-    runTestGatherer();
+    runTestGatherer(testCases, sourceFiles);
     compileIntoTempObjectFiles();
     linkObjectFilesWithGregTestDllToMakeProjectTestDll();
     createTestMainExecutableFromProjectDllAndGregTestDll();
@@ -41,6 +48,8 @@ int main()
         retval = 0;
     }
     removeFolder(TEMP_DIR);
+    freeTestCasesList(testCases);
+    freeSourceFileList(sourceFiles);
     return retval;
 }
 
@@ -50,17 +59,24 @@ void makeDir(char* dirName)
     forkAndRunChildProcess(mkdir, argv);
 }
 
-void runTestGatherer()
+void runTestGatherer(TestCaseList* testCases, SourceFileList* sourceFiles)
 {
     char startingDirectory[WINDOWS_MAX_PATH_LENGTH] = SRC_DIR;
 
-    TestCaseList* testCases = (TestCaseList*)malloc(sizeof(TestCaseList));
-    initTestCases(testCases);
-
-    loadTests(testCases, startingDirectory);
+    loadTests(testCases, sourceFiles, startingDirectory);
     writeTestsToTestMain(testCases);
 
-    freeTestCasesList(testCases);
+    printTestCaseList(testCases);
+}
+
+void printTestCaseList(const TestCaseList* list)
+{
+    printf("====================================\n");
+    for(int i = 0; i < list->size; i++)
+    {
+        printf("file: %s || testCase: %s\n", list->cases[i].testFile, list->cases[i].testName);
+    }  
+    printf("====================================\n");
 }
 
 void compileIntoTempObjectFiles()

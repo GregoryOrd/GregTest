@@ -1,8 +1,12 @@
 #ifndef GREG_TEST_MAIN
 #define GREG_TEST_MAIN 
 
+#include "TestGatherer/TestStructureDefs.h"
+#include "TestGatherer/SourceFileStructureDefs.h"
+
 void makeDir(char* dirName);
-void runTestGatherer();
+void runTestGatherer(TestCaseList* testCases, SourceFileList* sourceFiles);
+void printTestCaseList(const TestCaseList* list);
 void compileIntoTempObjectFiles();
 void linkObjectFilesWithGregTestDllToMakeProjectTestDll();
 void createTestMainExecutableFromProjectDllAndGregTestDll();

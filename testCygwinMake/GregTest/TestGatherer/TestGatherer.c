@@ -12,7 +12,14 @@ void initTestCases(TestCaseList* testCases)
     testCases->cases[0].testName = NULL; 
 }
 
-void loadTests(TestCaseList* testCases, char* basePath)
+void initSourceFiles(SourceFileList* sourceFiles)
+{
+    sourceFiles->size = 0;
+    sourceFiles->files = (SourceFile*)malloc(sizeof(SourceFile));
+    sourceFiles->files[0].name = NULL;
+}
+
+void loadTests(TestCaseList* testCases, SourceFileList* sourceFiles, char* basePath)
 {
     char* fileOrSubDirectoryFullPath = (char*)malloc(WINDOWS_MAX_PATH_LENGTH * sizeof(char*));
     struct dirent *fileOrSubDirectory;
@@ -26,14 +33,14 @@ void loadTests(TestCaseList* testCases, char* basePath)
     while ((fileOrSubDirectory = readdir(basePathDirectory)) != NULL)
     {
         copyFileOrSubDirectoryNameIntoPath(fileOrSubDirectoryFullPath, basePath, fileOrSubDirectory->d_name);
-        addTestCasesOrEnterSubDirectoryForRecursion(testCases, basePath, fileOrSubDirectory, fileOrSubDirectoryFullPath);
+        addTestCasesOrEnterSubDirectoryForRecursion(testCases, sourceFiles, basePath, fileOrSubDirectory, fileOrSubDirectoryFullPath);
     }
 
     closedir(basePathDirectory);
     free(fileOrSubDirectoryFullPath);
 }
 
-void addTestCasesOrEnterSubDirectoryForRecursion(TestCaseList* testCases, char* basePath, struct dirent *fileOrSubDirectory, char* fileOrSubDirectoryFullPath)
+void addTestCasesOrEnterSubDirectoryForRecursion(TestCaseList* testCases, SourceFileList* sourceFiles, char* basePath, struct dirent *fileOrSubDirectory, char* fileOrSubDirectoryFullPath)
 {
     if(isTestDir(basePath) && isTestFile(fileOrSubDirectory))
     {
@@ -41,7 +48,7 @@ void addTestCasesOrEnterSubDirectoryForRecursion(TestCaseList* testCases, char* 
     }
     if (isDirectory(fileOrSubDirectory))
     {
-        loadTests(testCases, fileOrSubDirectoryFullPath);
+        loadTests(testCases, sourceFiles, fileOrSubDirectoryFullPath);
     }
 }
 
@@ -66,6 +73,16 @@ void freeTestCasesList(TestCaseList* list)
     }
     free(list);
 }
+
+void freeSourceFileList(SourceFileList* list)
+{
+    for(int i = 0; i < list->size; i++)
+    {
+        free(list->files[i].name);
+    }
+    free(list);
+}
+
 
 void addTestCasesToList(TestCaseList* list, const char* pathToTestFile)
 {
