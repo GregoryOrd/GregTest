@@ -2,6 +2,7 @@
 
 #include "TestGatherer/TestGatherer.h"
 #include "TestGatherer/TestMainWriter.h"
+#include "CommandLineExecutables.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <sys/types.h> /* for pid_t */
@@ -45,8 +46,8 @@ int main()
 
 void makeDir(char* dirName)
 {
-    char* const argv[] = {"/usr/bin/mkdir.exe", dirName, NULL};
-    forkAndRunChildProcess("/usr/bin/mkdir.exe", argv);
+    char* const argv[] = {mkdir, dirName, NULL};
+    forkAndRunChildProcess(mkdir, argv);
 }
 
 void runTestGatherer()
@@ -64,58 +65,58 @@ void runTestGatherer()
 
 void compileIntoTempObjectFiles()
 {
-    char * const argv[] = {"/usr/bin/gcc.exe", "-c", "src/HelloWorld/testHelloWorld/TestHelloWorld.c",
+    char * const argv[] = {gcc, "-c", "src/HelloWorld/testHelloWorld/TestHelloWorld.c",
     "src/HelloWorld/testHelloWorld/TestHelloWorld2.c", "src/HelloWorld/HelloWorld.c", NULL};
-    forkAndRunChildProcess("/usr/bin/gcc.exe", argv);
+    forkAndRunChildProcess(gcc, argv);
 
-    char* const argv2[] = {"/usr/bin/mv.exe", "HelloWorld.o", "TestHelloWorld.o", "TestHelloWorld2.o", "temp", NULL};
-    forkAndRunChildProcess("/usr/bin/mv.exe", argv2);
+    char* const argv2[] = {mv, "HelloWorld.o", "TestHelloWorld.o", "TestHelloWorld2.o", TEMP_DIR, NULL};
+    forkAndRunChildProcess(mv, argv2);
 }
 
 void linkObjectFilesWithGregTestDllToMakeProjectTestDll()
 {
-    char * const argv[] = {"/usr/bin/gcc.exe", "-shared", "-o", "temp/TestHelloWorld.dll",
+    char * const argv[] = {gcc, "-shared", "-o", "temp/TestProject.dll",
     "temp/TestHelloWorld.o", "temp/TestHelloWorld2.o", "temp/HelloWorld.o", "-L./", "lib/GregTest.dll", NULL};
-    forkAndRunChildProcess("/usr/bin/gcc.exe", argv);
+    forkAndRunChildProcess(gcc, argv);
 }
 
 void createTestMainExecutableFromProjectDllAndGregTestDll()
 {
-    char * const argv[] = {"/usr/bin/gcc.exe", "-o", "temp/TestMain",
-    "temp/TestMain.c", "-L./", "temp/TestHelloWorld.dll", "lib/GregTest.dll", NULL};
-    forkAndRunChildProcess("/usr/bin/gcc.exe", argv); 
+    char * const argv[] = {gcc, "-o", "temp/TestMain",
+    "temp/TestMain.c", "-L./", "temp/TestProject.dll", "lib/GregTest.dll", NULL};
+    forkAndRunChildProcess(gcc, argv); 
 }
 
 int runTests()
 { 
-    char * const argv[] = {"/usr/bin/cp.exe", "temp/TestHelloWorld.dll", ".", NULL};
-    forkAndRunChildProcess("/usr/bin/cp.exe", argv);
+    char * const argv[] = {cp, "temp/TestProject.dll", ".", NULL};
+    forkAndRunChildProcess(cp, argv);
 
-    char * const argv1[] = {"/usr/bin/cp.exe", "lib/GregTest.dll", ".", NULL};
-    forkAndRunChildProcess("/usr/bin/cp.exe", argv1);
+    char * const argv1[] = {cp, "lib/GregTest.dll", ".", NULL};
+    forkAndRunChildProcess(cp, argv1);
 
     char * const argv2[] = {"temp/TestMain.exe", NULL};
     int testResult = forkAndRunChildProcess("temp/TestMain.exe", argv2); 
 
-    char * const argv3[] = {"/usr/bin/rm.exe", "GregTest.dll", NULL};
-    forkAndRunChildProcess("/usr/bin/rm.exe", argv3); 
+    char * const argv3[] = {rm, "GregTest.dll", NULL};
+    forkAndRunChildProcess(rm, argv3); 
 
-    char * const argv4[] = {"/usr/bin/rm.exe", "TestHelloWorld.dll", NULL};
-    forkAndRunChildProcess("/usr/bin/rm.exe", argv4); 
+    char * const argv4[] = {rm, "TestProject.dll", NULL};
+    forkAndRunChildProcess(rm, argv4); 
 
     return testResult;
 }
 
 int compileObjectFilesIntoProjectExecutable()
 {
-    char * const argv[] = {"/usr/bin/gcc.exe", "temp/HelloWorld.o", "-o", "dist/HelloWorld.exe", NULL};
-    forkAndRunChildProcess("/usr/bin/gcc.exe", argv);   
+    char * const argv[] = {gcc, "temp/HelloWorld.o", "-o", "dist/HelloWorld.exe", NULL};
+    forkAndRunChildProcess(gcc, argv);   
 }
 
 void removeFolder(char* folderName)
 {
-    char * const argv[] = {"/usr/bin/rm.exe", folderName, "-r", NULL};
-    forkAndRunChildProcess("/usr/bin/rm.exe", argv);  
+    char * const argv[] = {rm, folderName, "-r", NULL};
+    forkAndRunChildProcess(rm, argv);  
 }
 
 int forkAndRunChildProcess(const char * pathToExecutable, char * const argv[])

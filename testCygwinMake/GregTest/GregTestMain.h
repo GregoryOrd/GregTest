@@ -1,6 +1,8 @@
 #ifndef GREG_TEST_MAIN
 #define GREG_TEST_MAIN 
 
+#define TEMP_DIR "temp"
+
 void makeDir(char* dirName);
 void runTestGatherer();
 void compileIntoTempObjectFiles();
