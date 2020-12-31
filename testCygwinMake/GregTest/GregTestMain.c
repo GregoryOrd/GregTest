@@ -23,16 +23,41 @@ int main()
     int retval = 1;
 
     TestFileList* testFiles = (TestFileList*)malloc(sizeof(TestFileList));
-    initTestFiles(testFiles);
-
     SourceFileList* sourceFiles = (SourceFileList*)malloc(sizeof(SourceFileList));
-    initSourceFiles(sourceFiles);
+    initFileListsAndTempDir(testFiles, sourceFiles);
 
-    makeDir(TEMP_DIR);
     runTestGatherer(testFiles, sourceFiles);
+    createTestMainExecutable(testFiles, sourceFiles);
+    retval = runTestsAndCompileIfTheyPass();
+
+    removeTempDirAndFreeFileLists(testFiles, sourceFiles);
+    return retval;
+}
+
+void initFileListsAndTempDir(TestFileList* testFiles, SourceFileList* sourceFiles)
+{
+    initTestFiles(testFiles);
+    initSourceFiles(sourceFiles);
+    makeDir(TEMP_DIR);
+}
+
+void createTestMainExecutable(TestFileList* testFiles, SourceFileList* sourceFiles)
+{
     compileIntoTempObjectFiles(testFiles, sourceFiles);
     linkObjectFilesWithGregTestDllToMakeProjectTestDll();
     createTestMainExecutableFromProjectDllAndGregTestDll();
+}
+
+void removeTempDirAndFreeFileLists(TestFileList* testFiles, SourceFileList* sourceFiles)
+{
+    removeFolder(TEMP_DIR);
+    freeTestFileList(testFiles);
+    freeSourceFileList(sourceFiles);
+}
+
+int runTestsAndCompileIfTheyPass()
+{
+    int retval = 1;
     int testResults = runTests();
     if(!testResults)
     {
@@ -47,9 +72,6 @@ int main()
         
         retval = 0;
     }
-    removeFolder(TEMP_DIR);
-    freeTestFileList(testFiles);
-    freeSourceFileList(sourceFiles);
     return retval;
 }
 

@@ -6,6 +6,10 @@
 
 void makeDir(char* dirName);
 void runTestGatherer(TestFileList* testFiles, SourceFileList* sourceFiles);
+int runTestsAndCompileIfTheyPass();
+void initFileListsAndTempDir(TestFileList* testFiles, SourceFileList* sourceFiles);
+void createTestMainExecutable(TestFileList* testFiles, SourceFileList* sourceFiles);
+void removeTempDirAndFreeFileLists(TestFileList* testFiles, SourceFileList* sourceFiles);
 void printTestCases(const TestFile* list);
 void printSourceFiles(const SourceFileList* list);
 void printTestFiles(const TestFileList* list);
