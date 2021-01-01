@@ -10,7 +10,7 @@ void main()
 
 void printHelloWorld()
 {
-	char* helloWorldStr;
+	char helloWorldStr[255];
 	helloWorldString(helloWorldStr);
 	printf(helloWorldStr);
 }

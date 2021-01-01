@@ -4,7 +4,7 @@
 
 void testHelloWorldString()
 {
-	const char* expected = "Hello Worlddgf";
+	const char* expected = "Hello World";
 	char actual[255];
 	helloWorldString(actual);
 
