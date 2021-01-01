@@ -14,7 +14,7 @@ void createTestMainExecutable(TestFileList* testFiles, SourceFileList* sourceFil
 void removeTempDirAndFreeFileLists(TestFileList* testFiles, SourceFileList* sourceFiles);
 void compileIntoTempObjectFiles(ObjectFileList* tempObjectFiles, TestFileList* testCases, SourceFileList* sourceFiles);
 void populateArgsFor_compileIntoTempObjectFiles(ObjectFileList* tempObjectFiles, ArgList* gccArgs, ArgList* mvArgs, TestFileList* testCases, SourceFileList* sourceFiles);
-void linkObjectFilesWithGregTestDllToMakeProjectTestDll();
+void linkObjectFilesWithGregTestDllToMakeProjectTestDll(ObjectFileList* tempObjectFiles);
 void createTestMainExecutableFromProjectDllAndGregTestDll();
 void getArgsForTestFiles(ObjectFileList* tempObjectFiles, int* argIndex, TestFileList* testFiles, ArgList* gccArgs, ArgList* mvArgs);
 void getArgsForSourceFiles(ObjectFileList* tempObjectFiles, int* argIndex, SourceFileList* sourceFiles, ArgList* gccArgs, ArgList* mvArgs);

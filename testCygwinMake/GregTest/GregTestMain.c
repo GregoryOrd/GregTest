@@ -47,8 +47,7 @@ void createTestMainExecutable(TestFileList* testFiles, SourceFileList* sourceFil
     initObjectFileList(tempObjectFiles);
 
     compileIntoTempObjectFiles(tempObjectFiles, testFiles, sourceFiles);
-
-    linkObjectFilesWithGregTestDllToMakeProjectTestDll();
+    linkObjectFilesWithGregTestDllToMakeProjectTestDll(tempObjectFiles);
     createTestMainExecutableFromProjectDllAndGregTestDll();
 
     freeObjectFileList(tempObjectFiles);
@@ -261,11 +260,27 @@ void reverseFileName(char* dest, char* src)
     dest[countUp] = '\0';
 }
 
-void linkObjectFilesWithGregTestDllToMakeProjectTestDll()
+void linkObjectFilesWithGregTestDllToMakeProjectTestDll(ObjectFileList* tempObjectFiles)
 {
-    char * const argv[] = {gcc, "-shared", "-o", TEMP_TEST_PROJECT_DLL, 
-    "temp/TestHelloWorld.o", "temp/TestHelloWorld2.o", "temp/HelloWorld.o", "-L./", LIB_GREG_TEST_DLL, NULL};
-    forkAndRunChildProcess(gcc, argv);
+    ArgList* gccArgs = (ArgList*)malloc(sizeof(ArgList));
+    gccArgs->size = tempObjectFiles->size + 7;
+    gccArgs->args = (char**)malloc(gccArgs->size * sizeof(char*));
+
+    gccArgs->args[0] = gcc;
+    gccArgs->args[1] = "-shared";
+    gccArgs->args[2] = "-o";
+    gccArgs->args[3] = TEMP_TEST_PROJECT_DLL;
+    for(int i = 0; i < tempObjectFiles->size; i++)
+    {
+        gccArgs->args[i + 4] = (&tempObjectFiles->files[i])->name;
+    }
+    gccArgs->args[gccArgs->size-3] = "-L./";
+    gccArgs->args[gccArgs->size-2] = LIB_GREG_TEST_DLL;
+    gccArgs->args[gccArgs->size-1] = NULL;
+
+    forkAndRunChildProcess(gcc, gccArgs->args);
+
+    freeArgList(gccArgs);
 }
 
 void createTestMainExecutableFromProjectDllAndGregTestDll()
