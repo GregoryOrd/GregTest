@@ -3,6 +3,7 @@
 
 #include "TestGatherer/TestStructureDefs.h"
 #include "TestGatherer/SourceFileStructureDefs.h"
+#include "ObjectFileStructureDefs.h"
 #include "ArgListDefs.h"
 
 void makeDir(char* dirName);
@@ -11,15 +12,18 @@ int runTestsAndCompileIfTheyPass();
 void initFileListsAndTempDir(TestFileList* testFiles, SourceFileList* sourceFiles);
 void createTestMainExecutable(TestFileList* testFiles, SourceFileList* sourceFiles);
 void removeTempDirAndFreeFileLists(TestFileList* testFiles, SourceFileList* sourceFiles);
-void compileIntoTempObjectFiles(TestFileList* testCases, SourceFileList* sourceFiles);
-void populateArgsFor_compileIntoTempObjectFiles(ArgList* gccArgs, ArgList* mvArgs, TestFileList* testCases, SourceFileList* sourceFiles);
+void compileIntoTempObjectFiles(ObjectFileList* tempObjectFiles, TestFileList* testCases, SourceFileList* sourceFiles);
+void populateArgsFor_compileIntoTempObjectFiles(ObjectFileList* tempObjectFiles, ArgList* gccArgs, ArgList* mvArgs, TestFileList* testCases, SourceFileList* sourceFiles);
 void linkObjectFilesWithGregTestDllToMakeProjectTestDll();
 void createTestMainExecutableFromProjectDllAndGregTestDll();
-void getArgsForTestFiles(int* argIndex, TestFileList* testFiles, ArgList* gccArgs, ArgList* mvArgs);
-void getArgsForSourceFiles(int* argIndex, SourceFileList* sourceFiles, ArgList* gccArgs, ArgList* mvArgs);
+void getArgsForTestFiles(ObjectFileList* tempObjectFiles, int* argIndex, TestFileList* testFiles, ArgList* gccArgs, ArgList* mvArgs);
+void getArgsForSourceFiles(ObjectFileList* tempObjectFiles, int* argIndex, SourceFileList* sourceFiles, ArgList* gccArgs, ArgList* mvArgs);
 int runTests();
 void determineObjectFileName(char* objectFileName, const char* filePath);
 int compileObjectFilesIntoProjectExecutable();
+void addTempObjectFileToList(ObjectFileList* list, char* filename);
+void freeObjectFileList(ObjectFileList* list);
+void initObjectFileList(ObjectFileList* objectFiles);
 void changeDirectory(char* dirToMoveTo);
 void copyTestProjectDllIntoTopLevelDir();
 void copyGregTestDllIntoTopLevelDir();

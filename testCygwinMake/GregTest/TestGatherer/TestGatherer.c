@@ -102,7 +102,7 @@ void freeSourceFileList(SourceFileList* list)
 void addSourceFileToList(SourceFileList* list, const char* pathToSourceFile)
 {
     list->files = (SourceFile*)realloc(list->files, ((list->size + 1) * sizeof(SourceFile)));
-    list->files[list->size].name = (char*)malloc(WINDOWS_MAX_PATH_LENGTH * sizeof(char*));; 
+    list->files[list->size].name = (char*)malloc(WINDOWS_MAX_PATH_LENGTH * sizeof(char*));
     strcpy(list->files[list->size].name, pathToSourceFile);
     list->size++; 
 }
