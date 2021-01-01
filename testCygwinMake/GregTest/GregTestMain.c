@@ -24,33 +24,30 @@ int main()
 
     TestFileList* testFiles = (TestFileList*)malloc(sizeof(TestFileList));
     SourceFileList* sourceFiles = (SourceFileList*)malloc(sizeof(SourceFileList));
-    initFileListsAndTempDir(testFiles, sourceFiles);
+    ObjectFileList* tempObjectFiles = (ObjectFileList*)malloc(sizeof(ObjectFileList));
+    initFileListsAndTempDir(testFiles, sourceFiles, tempObjectFiles);
 
     runTestGatherer(testFiles, sourceFiles);
-    createTestMainExecutable(testFiles, sourceFiles);
-    retval = runTestsAndCompileIfTheyPass();
+    createTestMainExecutable(testFiles, sourceFiles, tempObjectFiles);
+    retval = runTestsAndCompileIfTheyPass(tempObjectFiles);
 
-    removeTempDirAndFreeFileLists(testFiles, sourceFiles);
+    removeTempDirAndFreeFileLists(testFiles, sourceFiles, tempObjectFiles);
     return retval;
 }
 
-void initFileListsAndTempDir(TestFileList* testFiles, SourceFileList* sourceFiles)
+void initFileListsAndTempDir(TestFileList* testFiles, SourceFileList* sourceFiles, ObjectFileList* tempObjectFiles)
 {
     initTestFiles(testFiles);
     initSourceFiles(sourceFiles);
+    initObjectFileList(tempObjectFiles);
     makeDir(TEMP_DIR);
 }
 
-void createTestMainExecutable(TestFileList* testFiles, SourceFileList* sourceFiles)
+void createTestMainExecutable(TestFileList* testFiles, SourceFileList* sourceFiles, ObjectFileList* tempObjectFiles)
 {
-    ObjectFileList* tempObjectFiles = (ObjectFileList*)malloc(sizeof(ObjectFileList));
-    initObjectFileList(tempObjectFiles);
-
     compileIntoTempObjectFiles(tempObjectFiles, testFiles, sourceFiles);
     linkObjectFilesWithGregTestDllToMakeProjectTestDll(tempObjectFiles);
     createTestMainExecutableFromProjectDllAndGregTestDll();
-
-    freeObjectFileList(tempObjectFiles);
 }
 
 void initObjectFileList(ObjectFileList* objectFiles)
@@ -69,20 +66,21 @@ void freeObjectFileList(ObjectFileList* list)
     free(list);
 }
 
-void removeTempDirAndFreeFileLists(TestFileList* testFiles, SourceFileList* sourceFiles)
+void removeTempDirAndFreeFileLists(TestFileList* testFiles, SourceFileList* sourceFiles, ObjectFileList* tempObjectFiles)
 {
     removeFolder(TEMP_DIR);
     freeTestFileList(testFiles);
     freeSourceFileList(sourceFiles);
+    freeObjectFileList(tempObjectFiles);
 }
 
-int runTestsAndCompileIfTheyPass()
+int runTestsAndCompileIfTheyPass(ObjectFileList* tempObjectFiles)
 {
     int retval = 1;
     int testResults = runTests();
     if(!testResults)
     {
-        if(!compileObjectFilesIntoProjectExecutable())
+        if(!compileObjectFilesIntoProjectExecutable(tempObjectFiles))
         {
             printf("Build Successful!\n");
         }
@@ -159,7 +157,7 @@ void getArgsForTestFiles(ObjectFileList* tempObjectFiles, int* argIndex, TestFil
     {
         clearString(objectFileName);
         determineObjectFileName(objectFileName, testFiles->files[testFileIndex].name);
-        addTempObjectFileToList(tempObjectFiles, objectFileName);
+        addTempObjectFileToList(tempObjectFiles, objectFileName, false);
         gccArgs->args[*argIndex + gccFileArgOffset] = testFiles->files[testFileIndex].name;
         mvArgs->args[*argIndex + mvFileArgOffset] = (char*)malloc(strlen(objectFileName) * sizeof(char));
         strcpy(mvArgs->args[*argIndex + mvFileArgOffset], objectFileName);
@@ -179,7 +177,7 @@ void getArgsForSourceFiles(ObjectFileList* tempObjectFiles, int* argIndex, Sourc
     {
         clearString(objectFileName);
         determineObjectFileName(objectFileName, sourceFiles->files[sourceFileIndex].name);
-        addTempObjectFileToList(tempObjectFiles, objectFileName);
+        addTempObjectFileToList(tempObjectFiles, objectFileName, true);
         gccArgs->args[*argIndex + gccFileArgOffset] = sourceFiles->files[sourceFileIndex].name;
         mvArgs->args[*argIndex + mvFileArgOffset] = (char*)malloc(strlen(objectFileName) * sizeof(char));
         strcpy(mvArgs->args[*argIndex + mvFileArgOffset], objectFileName);
@@ -189,7 +187,7 @@ void getArgsForSourceFiles(ObjectFileList* tempObjectFiles, int* argIndex, Sourc
     free(objectFileName);
 }
 
-void addTempObjectFileToList(ObjectFileList* list, char* filename)
+void addTempObjectFileToList(ObjectFileList* list, char* filename, bool isFromSource)
 {
     int tempObjectFileLength = strlen(TEMP_DIR) + strlen("\\") + strlen(filename);
     char* tempObjectFile = (char*)malloc(tempObjectFileLength * sizeof(char));
@@ -201,6 +199,7 @@ void addTempObjectFileToList(ObjectFileList* list, char* filename)
     list->files = (ObjectFile*)realloc(list->files, ((list->size + 1) * sizeof(ObjectFile)));
     list->files[list->size].name = (char*)malloc(WINDOWS_MAX_PATH_LENGTH * sizeof(char*)); 
     strcpy(list->files[list->size].name, tempObjectFile);
+    list->files[list->size].isFromSource = isFromSource;
     list->size++; 
 
     free(tempObjectFile);
@@ -309,8 +308,26 @@ int runTests()
     return testResult;
 }
 
-int compileObjectFilesIntoProjectExecutable()
+int compileObjectFilesIntoProjectExecutable(ObjectFileList* tempObjectFiles)
 {
+    ArgList* gccArgs = (ArgList*)malloc(sizeof(ArgList));
+    gccArgs->size = tempObjectFiles->size + 4;
+    gccArgs->args = (char**)malloc(gccArgs->size * sizeof(char*));
+
+    gccArgs->args[0] = gcc;
+    for(int i = 0; i < gccArgs->size; i++)
+    {
+        ObjectFile* file = &tempObjectFiles->files[i];
+        if(file->isFromSource)
+        {
+            gccArgs->args[i+1] = file->name;
+        }
+    }
+    gccArgs->args[gccArgs->size-3] = "-o";
+    gccArgs->args[gccArgs->size-2] = PROJECT_EXE;
+    gccArgs->args[gccArgs->size-1] = NULL;
+
+
     char * const argv[] = {gcc, "temp/HelloWorld.o", "-o", PROJECT_EXE, NULL};
     forkAndRunChildProcess(gcc, argv);   
 }

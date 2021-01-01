@@ -9,9 +9,9 @@
 void makeDir(char* dirName);
 void runTestGatherer(TestFileList* testFiles, SourceFileList* sourceFiles);
 int runTestsAndCompileIfTheyPass();
-void initFileListsAndTempDir(TestFileList* testFiles, SourceFileList* sourceFiles);
-void createTestMainExecutable(TestFileList* testFiles, SourceFileList* sourceFiles);
-void removeTempDirAndFreeFileLists(TestFileList* testFiles, SourceFileList* sourceFiles);
+void initFileListsAndTempDir(TestFileList* testFiles, SourceFileList* sourceFiles, ObjectFileList* tempObjectFiles);
+void createTestMainExecutable(TestFileList* testFiles, SourceFileList* sourceFiles, ObjectFileList* tempObjectFiles);
+void removeTempDirAndFreeFileLists(TestFileList* testFiles, SourceFileList* sourceFiles, ObjectFileList* tempObjectFiles);
 void compileIntoTempObjectFiles(ObjectFileList* tempObjectFiles, TestFileList* testCases, SourceFileList* sourceFiles);
 void populateArgsFor_compileIntoTempObjectFiles(ObjectFileList* tempObjectFiles, ArgList* gccArgs, ArgList* mvArgs, TestFileList* testCases, SourceFileList* sourceFiles);
 void linkObjectFilesWithGregTestDllToMakeProjectTestDll(ObjectFileList* tempObjectFiles);
@@ -21,7 +21,7 @@ void getArgsForSourceFiles(ObjectFileList* tempObjectFiles, int* argIndex, Sourc
 int runTests();
 void determineObjectFileName(char* objectFileName, const char* filePath);
 int compileObjectFilesIntoProjectExecutable();
-void addTempObjectFileToList(ObjectFileList* list, char* filename);
+void addTempObjectFileToList(ObjectFileList* list, char* filename, bool isFromSource);
 void freeObjectFileList(ObjectFileList* list);
 void initObjectFileList(ObjectFileList* objectFiles);
 void changeDirectory(char* dirToMoveTo);
