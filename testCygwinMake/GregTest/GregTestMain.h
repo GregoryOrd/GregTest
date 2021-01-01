@@ -22,6 +22,8 @@ int runTests();
 void determineObjectFileName(char* objectFileName, const char* filePath);
 int compileObjectFilesIntoProjectExecutable();
 void addTempObjectFileToList(ObjectFileList* list, char* filename, bool isFromSource);
+int numObjectFilesFromSource(ObjectFileList* tempObjectFiles);
+void printArgList(ArgList* argList, char* description);
 void freeObjectFileList(ObjectFileList* list);
 void initObjectFileList(ObjectFileList* objectFiles);
 void changeDirectory(char* dirToMoveTo);

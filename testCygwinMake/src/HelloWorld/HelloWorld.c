@@ -1,5 +1,7 @@
 #include <stdio.h>
 #include "HelloWorld.h"
+#include "Hello.h"
+#include "World.h"
 
 void main()
 {
@@ -8,11 +10,13 @@ void main()
 
 void printHelloWorld()
 {
-	const char* helloWorldStr = helloWorldString();
+	char* helloWorldStr;
+	helloWorldString(helloWorldStr);
 	printf(helloWorldStr);
 }
 
-const char* helloWorldString()
+void helloWorldString(char* helloWorldStr)
 {
-	return "Hello World";
+	hello(helloWorldStr);
+	world(helloWorldStr);
 }

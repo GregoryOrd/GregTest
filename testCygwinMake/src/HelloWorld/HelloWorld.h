@@ -2,6 +2,6 @@
 #define HELLOWORLD_H
 
 void printHelloWorld();
-const char* helloWorldString();
+void helloWorldString(char* helloWorldStr);
 
 #endif

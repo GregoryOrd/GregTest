@@ -82,7 +82,7 @@ int runTestsAndCompileIfTheyPass(ObjectFileList* tempObjectFiles)
     {
         if(!compileObjectFilesIntoProjectExecutable(tempObjectFiles))
         {
-            printf("Build Successful!\n");
+            printf("\nBuild Successful!\n");
         }
         else
         {
@@ -90,6 +90,11 @@ int runTestsAndCompileIfTheyPass(ObjectFileList* tempObjectFiles)
         }
         
         retval = 0;
+    }
+    else if(testResults == 139)
+    {
+        printf("\nSegmentation Fault While Running the Tests\n");
+        printf("Build Failed");
     }
     return retval;
 }
@@ -124,6 +129,17 @@ void compileIntoTempObjectFiles(ObjectFileList* tempObjectFiles, TestFileList* t
 
     freeArgList(gccArgs);
     free(mvArgs);
+}
+
+void printArgList(ArgList* argList, char* description)
+{
+    printf("%s\n");
+    printf("===================================================\n");
+    for(int i = 0; i < argList->size; i++)
+    {
+        printf("args[%d]: %s\n", i, argList->args[i]);
+    }
+    printf("===================================================\n\n");
 }
 
 void freeArgList(ArgList* argList)
@@ -311,25 +327,40 @@ int runTests()
 int compileObjectFilesIntoProjectExecutable(ObjectFileList* tempObjectFiles)
 {
     ArgList* gccArgs = (ArgList*)malloc(sizeof(ArgList));
-    gccArgs->size = tempObjectFiles->size + 4;
+    gccArgs->size = numObjectFilesFromSource(tempObjectFiles) + 4;
     gccArgs->args = (char**)malloc(gccArgs->size * sizeof(char*));
 
     gccArgs->args[0] = gcc;
-    for(int i = 0; i < gccArgs->size; i++)
+    int numObjectFilesFromSourceAddedToArgsList = 0;
+    for(int i = 0; i < tempObjectFiles->size; i++)
     {
         ObjectFile* file = &tempObjectFiles->files[i];
         if(file->isFromSource)
         {
-            gccArgs->args[i+1] = file->name;
+            gccArgs->args[numObjectFilesFromSourceAddedToArgsList + 1] = file->name;
+            numObjectFilesFromSourceAddedToArgsList++;
         }
     }
     gccArgs->args[gccArgs->size-3] = "-o";
     gccArgs->args[gccArgs->size-2] = PROJECT_EXE;
     gccArgs->args[gccArgs->size-1] = NULL;
 
+    int retval = forkAndRunChildProcess(gcc, gccArgs->args);   
+    freeArgList(gccArgs);
+    return retval;
+}
 
-    char * const argv[] = {gcc, "temp/HelloWorld.o", "-o", PROJECT_EXE, NULL};
-    forkAndRunChildProcess(gcc, argv);   
+int numObjectFilesFromSource(ObjectFileList* tempObjectFiles)
+{
+    int count = 0;
+    for(int i = 0; i < tempObjectFiles->size; i++)
+    {
+        if((&tempObjectFiles->files[i])->isFromSource)
+        {
+            count++;
+        }
+    }
+    return count;
 }
 
 void removeFolder(char* folderName)
@@ -353,7 +384,7 @@ int forkAndRunChildProcess(const char * pathToExecutable, char * const argv[])
         waitpid(pid, &status, 0); /* wait for child to exit */
         if (WIFEXITED(status)) 
         { 
-            return WEXITSTATUS(status);         
+            return WEXITSTATUS(status);    
         } 
     } 
     #endif
@@ -362,7 +393,7 @@ int forkAndRunChildProcess(const char * pathToExecutable, char * const argv[])
     status = spawnv(P_WAIT, pathToExecutable, argv);
     if(WIFEXITED(status)) 
     { 
-        return = WEXITSTATUS(status);         
+        return WEXITSTATUS(status);   
     } 
     #endif
 }

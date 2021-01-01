@@ -93,7 +93,7 @@ void addTestMainCResultsCheckAndExits(char* main)
     strcat(main, "\t}\n");
     strcat(main, "\telse\n");
     strcat(main, "\t{\n");
-    strcat(main, "\t\tprintf(\"Tests Failed\\n\");\n");
+    strcat(main, "\t\tprintf(\"\\nTests Failed\\n\");\n");
     strcat(main, "\t}\n");
     strcat(main, "\texit(1);\n");
     strcat(main, "}\n");
