@@ -2,3 +2,5 @@ TODO (Some of these things belong here. Some belong in GregBuild)
 -------------------------------------------------------------------
 1) Start tracking time for each test case, total time for all tests
 2) Add timeout for test cases -> fail if exceeded
+3) Display File name as well as test case name when printing the pass/fail message inside the
+  GregTest::pass and GregTest::fail functions.
