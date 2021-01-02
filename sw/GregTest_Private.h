@@ -1,9 +1,9 @@
 #ifndef GREG_TEST_PRIVATE_H
 #define GREG_TEST_PRIVATE_H
 
-#include <string.h>
-#include <stdio.h>
 #include <stdbool.h>
+#include <stdio.h>
+#include <string.h>
 
 #define G_ASSERT_STR_EQ(expected, actual) G_ASSERT_EQ_STR(expected, actual, __func__)
 
