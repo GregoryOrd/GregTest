@@ -1,12 +1,4 @@
-TODO
------
-1) Have a GregTest.exe that runs the TestGatherer, then compiles TestMain, the executes TestMain.exe
-2) Have TestGatherer write into the make file
-3) Create a SourceFileGatherer that gather source files and writes them into the makefiles automatically
- so that they don't need to be put in there to compile everytime a new src file is added
-4) Start tracking time for each test case, total time for all tests
-5) Add timeout for test cases -> fail if exceeded
-6) Make test file and test case definitions resource configurable.
-	- Perhaps we could define these rules in an XML file, then write an XML parser to read them at runtime
-	- See the structs in TestGatherer.h for determining what variable constitute these rules
-	- The has special characters definition could also be a rule in this XML
+TODO (Some of these things belong here. Some belong in GregBuild)
+-------------------------------------------------------------------
+1) Start tracking time for each test case, total time for all tests
+2) Add timeout for test cases -> fail if exceeded
