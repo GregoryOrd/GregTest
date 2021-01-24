@@ -1,0 +1,6 @@
+AlignAfterOpenBracket: AlwaysBreak
+AlignConsecutiveMacros: true
+BreakBeforeBraces: Allman
+ColumnLimit: 150
+IndentWidth: 3
+BasedOnStyle: Google
