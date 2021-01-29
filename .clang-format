@@ -2,7 +2,7 @@ AlignAfterOpenBracket: AlwaysBreak
 AlignConsecutiveMacros: true
 BreakBeforeBraces: Allman
 DerivePointerAlignment: false
-ColumnLimit: 150
+ColumnLimit: 175
 IndentWidth: 3
 PointerAlignment: Left
 BasedOnStyle: Google
