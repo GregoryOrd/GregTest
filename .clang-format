@@ -1,6 +1,8 @@
 AlignAfterOpenBracket: AlwaysBreak
 AlignConsecutiveMacros: true
 BreakBeforeBraces: Allman
+DerivePointerAlignment: false
 ColumnLimit: 150
 IndentWidth: 3
+PointerAlignment: Left
 BasedOnStyle: Google
