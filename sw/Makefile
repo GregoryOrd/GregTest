@@ -1,15 +1,17 @@
 distDirectory = ../dist
+CC=gcc
+CFLAGS=-fPIC
 
 GregTestDll: $(distDirectory)
 	# Compile to .o files
-	gcc -c GregTest.c
+	$(CC) $(CFLAGS) -c GregTest.c
 
-	# Link into a dll, then remove .o files
-	gcc -shared -o ../dist/GregTest.dll GregTest.o
+	# Link into a so, then remove .o files
+	$(CC) $(CFLAGS) -shared -o ../dist/GregTest.so GregTest.o
 	rm *.o
 
 $(distDirectory):
 	mkdir ../dist
 	
 clean:
-	rm ../dist/GregTest.dll
+	rm ../dist/GregTest.so
