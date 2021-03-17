@@ -1,10 +1,6 @@
 Small Refactorings / Unscheduled Improvements
 -----------------------------------------------
-*0a and 0b are also in the GregBuild TODOs.txt since so work needs to be done there
-as well to interface correctly with GregTest
-0a) Install GregTest.so in the default lib path so the user doesn't need to worry about
-    having it in their repo
-0b) Add GregTest.h to the inlcude path on install
+- No small refactorings or unscheduled improvements
 
 
 Plan for Release 1.0:
