@@ -1,6 +1,30 @@
-TODO (Some of these things belong here. Some belong in GregBuild)
--------------------------------------------------------------------
-1) Start tracking time for each test case, total time for all tests
-2) Add timeout for test cases -> fail if exceeded
-3) Display File name as well as test case name when printing the pass/fail message inside the
+Small Refactorings / Unscheduled Improvements
+-----------------------------------------------
+*0a and 0b are also in the GregBuild TODOs.txt since so work needs to be done there
+as well to interface correctly with GregTest
+0a) Install GregTest.so in the default lib path so the user doesn't need to worry about
+    having it in their repo
+0b) Add GregTest.h to the inlcude path on install
+
+
+Plan for Release 1.0:
+------------------------
+1) Change the result() function in GregTest to return an enum
+    - 0 => no tests run
+    - 1 => tests passed successfully
+    - 2 => tests failed
+2) Add asserts to GregTest for all standard types (int, double, float, stdint.h types) 
+3) Add expect calls for testing
+4) Add function for beforeEachTest, afterEachTest, beforeAllTests, afterAllTests
+5) Documentation Review and Improvements
+6) Explore git tags and prep to make a formal release
+
+
+
+Plan for Release 1.1:
+------------------------
+1) Add ability to define a "comparator" function for comparing custom structs 
+2) Start tracking time for each test case, total time for all tests
+3) Add timeout for test cases -> fail if exceeded
+4) Display File name as well as test case name when printing the pass/fail message inside the
   GregTest::pass and GregTest::fail functions.
