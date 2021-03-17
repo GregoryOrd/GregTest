@@ -25,7 +25,7 @@ $(GREGTEST_O): $(GREGTEST_C) $(GREGTEST_H) $(GREGTEST_H_PRIVATE)
 	$(CC) $(CFLAGS) -c $<
 	
 clean:
-	rm $(USR_LIB)/GregTest.so
-	rm $(USR_INCLUDE)/GregTest.h
+	sudo rm $(USR_LIB)/GregTest.so
+	sudo rm $(USR_INCLUDE)/GregTest.h
 	rm $(distSo)
 	rm *.o
