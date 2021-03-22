@@ -51,3 +51,15 @@ void G_ASSERT_EQ_UNSIGNED_CHAR(const unsigned char expected, const unsigned char
       fail_uchar(testName, expected, actual);
    }
 }
+
+void G_ASSERT_EQ_SIGNED_CHAR(const signed char expected, const signed char actual, const char* testName)
+{
+   if (expected == actual)
+   {
+      pass(testName);
+   }
+   else
+   {
+      fail_schar(testName, expected, actual);
+   }
+}

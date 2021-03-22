@@ -29,3 +29,9 @@ void fail_uchar(const char* testName, const unsigned char expected, const unsign
    printf("[FAIL]: %s\n[Expected]: %d\n[Actual]: %d\n\n", testName, expected, actual);
    andResult(false);
 }
+
+void fail_schar(const char* testName, const signed char expected, const signed char actual)
+{
+   printf("[FAIL]: %s\n[Expected]: %d\n[Actual]: %d\n\n", testName, expected, actual);
+   andResult(false);
+}
