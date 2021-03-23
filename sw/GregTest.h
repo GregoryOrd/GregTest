@@ -16,7 +16,9 @@
 #define G_ASSERT_UNSIGNED_CHAR_EQ(expected, actual) G_ASSERT_EQ_UNSIGNED_CHAR(expected, actual, __func__)
 #define G_ASSERT_SIGNED_CHAR_EQ(expected, actual) G_ASSERT_EQ_SIGNED_CHAR(expected, actual, __func__)
 #define G_ASSERT_FLOAT_EQ(expected, actual) G_ASSERT_EQ_FLOAT(expected, actual, __func__)
-#define G_ASSERT_DOUBLE_EQ(expected, actual) G_ASSERT_EQ_FLOAT(expected, actual, __func__)
+#define G_ASSERT_DOUBLE_EQ(expected, actual) G_ASSERT_EQ_DOUBLE(expected, actual, __func__)
+#define G_ASSERT_FLOAT_NEAR(expected, actual, epsilon) G_ASSERT_NEAR_FLOAT(expected, actual, epsilon, __func__)
+#define G_ASSERT_DOUBLE_NEAR(expected, actual, epsilon) G_ASSERT_NEAR_DOUBLE(expected, actual, epsilon, __func__)
 
 #ifdef __cplusplus
 extern "C" {
@@ -32,6 +34,8 @@ LibraryImport void G_ASSERT_EQ_UNSIGNED_CHAR(const unsigned char expected, const
 LibraryImport void G_ASSERT_EQ_SIGNED_CHAR(const signed char expected, const signed char actual, const char* testName);
 LibraryImport void G_ASSERT_EQ_FLOAT(const float expected, const float actual, const char* testName);
 LibraryImport void G_ASSERT_EQ_DOUBLE(const double expected, const double actual, const char* testName);
+LibraryImport void G_ASSERT_NEAR_FLOAT(const float expected, const float actual, const float epsilon, const char* testName);
+LibraryImport void G_ASSERT_NEAR_DOUBLE(const double expected, const double actual, const double epsilon, const char* testName);
 
 #ifdef __cplusplus
 }

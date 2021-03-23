@@ -113,3 +113,20 @@ void G_ASSERT_EQ_DOUBLE(const double expected, const double actual, const char* 
       fail_double(testName, expected, actual);
    }
 }
+
+void G_ASSERT_NEAR_FLOAT(const float expected, const float actual, const float epsilon, const char* testName) { G_ASSERT_NEAR_DOUBLE(expected, actual, epsilon, testName); }
+
+void G_ASSERT_NEAR_DOUBLE(const double expected, const double actual, const double epsilon, const char* testName)
+{
+   double rangeMin = expected - epsilon;
+   double rangeMax = expected + epsilon;
+
+   if (rangeMin <= actual && actual <= rangeMax)
+   {
+      pass(testName);
+   }
+   else
+   {
+      fail_double_epsilon(testName, expected, actual, epsilon);
+   }
+}

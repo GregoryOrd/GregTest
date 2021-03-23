@@ -59,3 +59,9 @@ void fail_double(const char* testName, const double expected, const double actua
    printf("[FAIL]: %s\n[Expected]: %f\n[Actual]: %f\n\n", testName, expected, actual);
    andResult(false);
 }
+
+void fail_double_epsilon(const char* testName, const double expected, const double actual, const double epsilon)
+{
+   printf("[FAIL]: %s\n[Expected]: %f\n[Actual]: %f\n[EPSILON]: %f\n\n", testName, expected, actual, epsilon);
+   andResult(false);
+}

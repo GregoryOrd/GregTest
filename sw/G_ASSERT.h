@@ -11,5 +11,6 @@ void G_ASSERT_EQ_UNSIGNED_CHAR(const unsigned char expected, const unsigned char
 void G_ASSERT_EQ_SIGNED_CHAR(const signed char expected, const signed char actual, const char* testName);
 void G_ASSERT_EQ_FLOAT(const float expected, const float actual, const char* testName);
 void G_ASSERT_EQ_DOUBLE(const double expected, const double actual, const char* testName);
+void G_ASSERT_NEAR_DOUBLE(const double expected, const double actual, const double epsilon, const char* testName);
 
 #endif
