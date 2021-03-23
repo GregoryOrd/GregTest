@@ -35,3 +35,9 @@ void fail_schar(const char* testName, const signed char expected, const signed c
    printf("[FAIL]: %s\n[Expected]: %d\n[Actual]: %d\n\n", testName, expected, actual);
    andResult(false);
 }
+
+void fail_long(const char* testName, const long expected, const long actual)
+{
+   printf("[FAIL]: %s\n[Expected]: %ld\n[Actual]: %ld\n\n", testName, expected, actual);
+   andResult(false);
+}

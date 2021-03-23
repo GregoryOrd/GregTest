@@ -63,3 +63,15 @@ void G_ASSERT_EQ_SIGNED_CHAR(const signed char expected, const signed char actua
       fail_schar(testName, expected, actual);
    }
 }
+
+void G_ASSERT_EQ_LONG(const long expected, const long actual, const char* testName)
+{
+   if (expected == actual)
+   {
+      pass(testName);
+   }
+   else
+   {
+      fail_long(testName, expected, actual);
+   }
+}
