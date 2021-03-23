@@ -28,6 +28,18 @@ void G_ASSERT_EQ_INT(const int expected, const int actual, const char* testName)
    }
 }
 
+void G_ASSERT_EQ_UNSIGNED_INT(const unsigned int expected, const unsigned int actual, const char* testName)
+{
+   if (expected == actual)
+   {
+      pass(testName);
+   }
+   else
+   {
+      fail_uint(testName, expected, actual);
+   }
+}
+
 void G_ASSERT_EQ_CHAR(const char expected, const char actual, const char* testName)
 {
    if (expected == actual)
