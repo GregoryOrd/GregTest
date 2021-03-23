@@ -5,13 +5,11 @@ Small Refactorings / Unscheduled Improvements
 
 Plan for Release 1.0:
 ------------------------
-1) Add asserts to GregTest for all standard types (int, double, float, stdint.h types) 
-  - Also add assert_near functions with epsilon values for floats/doubles/long doubles
-2) Add expect calls for testing
-3) Add function for beforeEachTest, afterEachTest, beforeAllTests, afterAllTests
+1) Add expect calls for testing
+2) Add function for beforeEachTest, afterEachTest, beforeAllTests, afterAllTests
 --------------------------------------------------------------------------------------
-4) Documentation Review and Improvements
-5) Explore git tags and prep to make a formal release
+3) Documentation Review and Improvements
+4) Explore git tags and prep to make a formal release
 
 
 
