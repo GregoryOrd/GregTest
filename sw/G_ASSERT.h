@@ -9,5 +9,7 @@ void G_ASSERT_EQ_UNSIGNED_LONG(const unsigned long expected, const unsigned long
 void G_ASSERT_EQ_CHAR(const char expected, const char actual, const char* testName);
 void G_ASSERT_EQ_UNSIGNED_CHAR(const unsigned char expected, const unsigned char actual, const char* testName);
 void G_ASSERT_EQ_SIGNED_CHAR(const signed char expected, const signed char actual, const char* testName);
+void G_ASSERT_EQ_FLOAT(const float expected, const float actual, const char* testName);
+void G_ASSERT_EQ_DOUBLE(const double expected, const double actual, const char* testName);
 
 #endif

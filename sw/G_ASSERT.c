@@ -99,3 +99,17 @@ void G_ASSERT_EQ_UNSIGNED_LONG(const unsigned long expected, const unsigned long
       fail_ulong(testName, expected, actual);
    }
 }
+
+void G_ASSERT_EQ_FLOAT(const float expected, const float actual, const char* testName) { G_ASSERT_EQ_DOUBLE(expected, actual, testName); }
+
+void G_ASSERT_EQ_DOUBLE(const double expected, const double actual, const char* testName)
+{
+   if (expected == actual)
+   {
+      pass(testName);
+   }
+   else
+   {
+      fail_double(testName, expected, actual);
+   }
+}

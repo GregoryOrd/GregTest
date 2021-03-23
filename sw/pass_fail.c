@@ -53,3 +53,9 @@ void fail_ulong(const char* testName, const unsigned long expected, const unsign
    printf("[FAIL]: %s\n[Expected]: %lu\n[Actual]: %lu\n\n", testName, expected, actual);
    andResult(false);
 }
+
+void fail_double(const char* testName, const double expected, const double actual)
+{
+   printf("[FAIL]: %s\n[Expected]: %f\n[Actual]: %f\n\n", testName, expected, actual);
+   andResult(false);
+}
