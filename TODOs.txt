@@ -5,8 +5,7 @@ Small Refactorings / Unscheduled Improvements
 
 Plan for Release 0.0.1:
 ------------------------
-1) Documentation Review and Improvements
-2) Explore git tags and prep to make a formal release
+1) Explore git tags and prep to make a formal release
 
 
 
