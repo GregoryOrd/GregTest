@@ -26,7 +26,7 @@
 *.dll
 *.so
 *.so.*
-!gt*.so
+!GT*.so
 *.dylib
 
 # Executables
