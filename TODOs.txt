@@ -3,12 +3,6 @@ Small Refactorings / Unscheduled Improvements
 - No small refactorings or unscheduled improvements
 
 
-Plan for Release 0.0.1:
-------------------------
-1) Explore git tags and prep to make a formal release
-
-
-
 Plan for Release 0.0.2:
 ------------------------
 1) Add expect calls for testing
