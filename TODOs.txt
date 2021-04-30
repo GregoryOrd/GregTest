@@ -6,13 +6,14 @@ Small Refactorings / Unscheduled Improvements
 Plan for Release 0.0.2:
 ------------------------
 1) Add expect calls for testing
-2) Add function for beforeEachTest, afterEachTest, beforeAllTests, afterAllTests
-3) Change the result() function in GregTest to return an enum
+2) Add ability to skip tests
+3) Add function for beforeEachTest, afterEachTest, beforeAllTests, afterAllTests
+4) Change the result() function in GregTest to return an enum
     - 0 => no tests run
     - 1 => tests passed successfully
     - 2 => tests failed
-4) Add ability to define a "comparator" function for comparing custom structs 
-5) Start tracking time for each test case, total time for all tests
-6) Add timeout for test cases -> fail if exceeded
-7) Display File name as well as test case name when printing the pass/fail message inside the
+5) Add ability to define a "comparator" function for comparing custom structs 
+6) Start tracking time for each test case, total time for all tests
+7) Add timeout for test cases -> fail if exceeded
+8) Display File name as well as test case name when printing the pass/fail message inside the
   GregTest::pass and GregTest::fail functions.
