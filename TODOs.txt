@@ -1,6 +1,6 @@
 Small Refactorings / Unscheduled Improvements
 -----------------------------------------------
-- No small refactorings or unscheduled improvements
+- Add expect_true and expect_false
 
 
 Plan for Release 0.0.2:
