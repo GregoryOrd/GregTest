@@ -6,6 +6,7 @@ Small Refactorings / Unscheduled Improvements
 Plan for Release 0.0.2:
 ------------------------
 1) Add expect calls for testing
+	- Also want ability to check for a correct sequence of expect calls
 2) Add ability to skip tests
 3) Add function for beforeEachTest, afterEachTest, beforeAllTests, afterAllTests
 4) Change the result() function in GregTest to return an enum
