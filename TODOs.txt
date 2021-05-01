@@ -1,12 +1,21 @@
 Small Refactorings / Unscheduled Improvements
 -----------------------------------------------
-- Add expect_true and expect_false
+- Add expect_true, expect_false, and expect_bool_eq
+- Add support for data driving tests
+- Add support for multiple asserts in a single test 
+  - Right now it shows actual and expected for all of the asserts, but does not indicate 
+    which one is which.
+  - Looks like the display is in order matching the order of the asserts in the code,
+  so not super urgent because the reader can still figure out by matching the orders.
+
+
 
 
 Plan for Release 0.0.2:
 ------------------------
 1) Add expect calls for testing
 	- Also want ability to check for a correct sequence of expect calls
+  - Also want the ability to check how many time the expected function was called
 2) Add ability to skip tests
 3) Add function for beforeEachTest, afterEachTest, beforeAllTests, afterAllTests
 4) Change the result() function in GregTest to return an enum
