@@ -53,4 +53,4 @@ clean:
 	sudo rm $(USR_LIB)/GregTest.so
 	sudo rm $(USR_INCLUDE)/GregTest.h
 	rm $(distSo)
-	rm $(BUILD)
+	rm $(BUILD)/*.o

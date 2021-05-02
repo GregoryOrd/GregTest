@@ -1,6 +1,5 @@
 #include "G_EXPECT_CALL.h"
 
-#include <stdio.h>
 #include <stdlib.h>
 
 #include "../../GregCToolkit/sw/Collections/LinkedList/LinkedList.h"
@@ -20,7 +19,6 @@ void freeFunctionPointerData(void* functionPtr)
 
 void __cyg_profile_func_enter(void* this_fn, void* call_site)
 {
-   printf("Entering: %p, %p\n", this_fn, call_site);
    if (origin.hasReturned == true)
    {
       origin.origin = this_fn;
@@ -45,17 +43,18 @@ void __cyg_profile_func_exit(void* this_fn, void* call_site)
 {
    if (origin.isValid && this_fn == origin.origin)
    {
-      printf("Returning to original: %p, %p\n", this_fn, call_site);
       origin.isValid = false;
 
-      // Check if the expected functions are present in the actually called list
       bool correctCalls = true;
       for (int i = 0; i < expectedCalls->size; i++)
       {
-         void* expectedCall = (void*)at_ll(expectedCalls, i, EXPECTED_CALLS_TYPE);
+         void* expectedCall = (void*)at_ll(expectedCalls, EXPECTED_CALLS_TYPE, i);
          bool callFound = contains_ll(actualCalls, expectedCall, ACTUAL_CALLS_TYPE);
          correctCalls &= callFound;
-         append_ll(missedCalls, expectedCall, MISSED_CALLS_TYPE);
+         if (!callFound)
+         {
+            append_ll(missedCalls, expectedCall, MISSED_CALLS_TYPE);
+         }
       }
       if (correctCalls)
       {
@@ -81,6 +80,4 @@ void G_EXPECT_FUNCTION_CALLED(const void* functionPtr, const char* testName)
    origin.isValid = true;
    append_ll(expectedCalls, (void*)functionPtr, EXPECTED_CALLS_TYPE);
    executingTest.testName = testName;
-
-   printf("Expecting call to function at address: %p\n", functionPtr);
 }
