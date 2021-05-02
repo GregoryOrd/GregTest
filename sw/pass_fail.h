@@ -1,6 +1,8 @@
 #ifndef PASS_FAIL_H
 #define PASS_FIAL_H
 
+#include "../../GregCToolkit/sw/Collections/LinkedList/LinkedList.h"
+
 void pass(const char* testName);
 
 void fail_str(const char* testName, const char* expected, const char* actual);
@@ -13,5 +15,6 @@ void fail_uchar(const char* testName, const unsigned char expected, const unsign
 void fail_schar(const char* testName, const signed char expected, const signed char actual);
 void fail_double(const char* testName, const double expected, const double actual);
 void fail_double_epsilon(const char* testName, const double expected, const double actual, const double epsilon);
+void fail_expect_call(const char* testName, LinkedList* missedCalls);
 
 #endif

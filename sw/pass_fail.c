@@ -2,6 +2,7 @@
 
 #include <stdio.h>
 
+#include "G_EXPECT_CALL_DEFS.h"
 #include "result.h"
 
 void pass(const char* testName) { printf("[PASS]: %s\n", testName); }
@@ -63,5 +64,15 @@ void fail_double(const char* testName, const double expected, const double actua
 void fail_double_epsilon(const char* testName, const double expected, const double actual, const double epsilon)
 {
    printf("[FAIL]: %s\n[Expected]: %f\n[Actual]: %f\n[EPSILON]: %f\n\n", testName, expected, actual, epsilon);
+   andResult(false);
+}
+
+void fail_expect_call(const char* testName, LinkedList* missedCalls)
+{
+   for (int i = 0; i < missedCalls->size; i++)
+   {
+      const void* functionPtr = at_ll(missedCalls, MISSED_CALLS_TYPE, i);
+      printf("[FAIL]: %s\nExpected %p to be called, but it never was.\n\n", testName, functionPtr);
+   }
    andResult(false);
 }

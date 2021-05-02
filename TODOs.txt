@@ -7,6 +7,9 @@ Small Refactorings / Unscheduled Improvements
     which one is which.
   - Looks like the display is in order matching the order of the asserts in the code,
   so not super urgent because the reader can still figure out by matching the orders.
+  - Add documentation note for both customers and developers that we need 
+    "hostCompilerOption:-finstrument-functions" 
+  in the config file to allow for G_EXPECT_CALL functionality in tests
 
 
 

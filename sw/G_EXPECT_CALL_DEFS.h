@@ -1,0 +1,8 @@
+#ifndef G_EXPECT_CALL_DEFS
+#define G_EXPECT_CALL_DEFS
+
+#define EXPECTED_CALLS_TYPE 0
+#define ACTUAL_CALLS_TYPE   1
+#define MISSED_CALLS_TYPE   2
+
+#endif
