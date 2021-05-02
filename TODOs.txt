@@ -1,15 +1,15 @@
 Small Refactorings / Unscheduled Improvements
 -----------------------------------------------
-- Add expect_true, expect_false, and expect_bool_eq
 - Add support for data driving tests
 - Add support for multiple asserts in a single test 
   - Right now it shows actual and expected for all of the asserts, but does not indicate 
     which one is which.
   - Looks like the display is in order matching the order of the asserts in the code,
   so not super urgent because the reader can still figure out by matching the orders.
-  - Add documentation note for both customers and developers that we need 
+- Add documentation note for both customers and developers that we need 
     "hostCompilerOption:-finstrument-functions" 
-  in the config file to allow for G_EXPECT_CALL functionality in tests
+    in the config file to allow for G_EXPECT_CALL functionality in tests
+- Cleanup G_EXPECT_CALL.c
 
 
 

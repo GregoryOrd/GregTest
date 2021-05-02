@@ -5,6 +5,7 @@
 
 void pass(const char* testName);
 
+void fail_bool(const char* testName, const bool expected, const bool actual);
 void fail_str(const char* testName, const char* expected, const char* actual);
 void fail_int(const char* testName, const int expected, const int actual);
 void fail_uint(const char* testName, const unsigned int expected, const unsigned actual);
@@ -16,5 +17,7 @@ void fail_schar(const char* testName, const signed char expected, const signed c
 void fail_double(const char* testName, const double expected, const double actual);
 void fail_double_epsilon(const char* testName, const double expected, const double actual, const double epsilon);
 void fail_expect_call(const char* testName, LinkedList* missedCalls);
+void fail_expect_true(const char* testName);
+void fail_expect_false(const char* testName);
 
 #endif

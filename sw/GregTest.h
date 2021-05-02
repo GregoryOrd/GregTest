@@ -7,6 +7,11 @@
 #define LibraryImport   
 #endif
 
+#include <stdbool.h>
+
+#define G_EXPECT_TRUE(actual) G_TRUE_EXPECT(actual, __func__)
+#define G_EXPECT_FALSE(actual) G_FALSE_EXPECT(actual, __func__)
+#define G_ASSERT_BOOL_EQ(expected, actual) G_ASSERT_EQ_BOOL(expected, actual, __func__)
 #define G_ASSERT_STR_EQ(expected, actual) G_ASSERT_EQ_STR(expected, actual, __func__)
 #define G_ASSERT_INT_EQ(expected, actual) G_ASSERT_EQ_INT(expected, actual, __func__)
 #define G_ASSERT_UNSIGNED_INT_EQ(expected, actual) G_ASSERT_EQ_UNSIGNED_INT(expected, actual, __func__)
@@ -25,6 +30,9 @@
 extern "C" {
 #endif  
 
+LibraryImport void G_TRUE_EXPECT(const bool actual, const char* testName);
+LibraryImport void G_FALSE_EXPECT(const bool actual, const char* testName);
+LibraryImport void G_ASSERT_EQ_BOOL(const bool expected, const bool actual, const char* testName);
 LibraryImport void G_ASSERT_EQ_STR(const char* expected, const char* actual, const char* testName);
 LibraryImport void G_ASSERT_EQ_INT(const int expected, const int actual, const char* testName);
 LibraryImport void G_ASSERT_EQ_UNSIGNED_INT(const unsigned int expected, const unsigned int actual, const char* testName);

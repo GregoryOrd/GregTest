@@ -7,6 +7,35 @@
 
 void pass(const char* testName) { printf("[PASS]: %s\n", testName); }
 
+void fail_bool(const char* testName, const bool expected, const bool actual)
+{
+   const char* trueString = "true";
+   const char* falseString = "false";
+   const char* expectedString = "";
+   const char* actualString = "";
+
+   if (expected)
+   {
+      expectedString = trueString;
+   }
+   else
+   {
+      expectedString = falseString;
+   }
+
+   if (actual)
+   {
+      actualString = trueString;
+   }
+   else
+   {
+      actualString = falseString;
+   }
+
+   printf("[FAIL]: %s\n[Expected]: %s\n[Actual]: %s\n\n", testName, expectedString, actualString);
+   andResult(false);
+}
+
 void fail_str(const char* testName, const char* expected, const char* actual)
 {
    printf("[FAIL]: %s\n[Expected]: %s\n[Actual]: %s\n\n", testName, expected, actual);
@@ -74,5 +103,19 @@ void fail_expect_call(const char* testName, LinkedList* missedCalls)
       const void* functionPtr = at_ll(missedCalls, MISSED_CALLS_TYPE, i);
       printf("[FAIL]: %s\nExpected %p to be called, but it never was.\n\n", testName, functionPtr);
    }
+   andResult(false);
+}
+
+void fail_expect_true(const char* testName)
+{
+   printf("[FAIL]: %s\nThe boolean expression was expected true, but was actually false.\n\n", testName);
+
+   andResult(false);
+}
+
+void fail_expect_false(const char* testName)
+{
+   printf("[FAIL]: %s\nThe boolean expression was expected false, but was actually true.\n\n", testName);
+
    andResult(false);
 }

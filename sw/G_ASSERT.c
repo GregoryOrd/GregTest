@@ -4,6 +4,42 @@
 
 #include "pass_fail.h"
 
+void G_TRUE_EXPECT(const bool actual, const char* testName)
+{
+   if (actual)
+   {
+      pass(testName);
+   }
+   else
+   {
+      fail_expect_true(testName);
+   }
+}
+
+void G_FALSE_EXPECT(const bool actual, const char* testName)
+{
+   if (!actual)
+   {
+      pass(testName);
+   }
+   else
+   {
+      fail_expect_false(testName);
+   }
+}
+
+void G_ASSERT_EQ_BOOL(const bool expected, const bool actual, const char* testName)
+{
+   if (expected == actual)
+   {
+      pass(testName);
+   }
+   else
+   {
+      fail_bool(testName, expected, actual);
+   }
+}
+
 void G_ASSERT_EQ_STR(const char* expected, const char* actual, const char* testName)
 {
    if (strcmp(expected, actual) == 0)
