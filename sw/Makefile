@@ -38,15 +38,19 @@ $(distDirectory):
 	mkdir -p $(distDirectory)
 
 $(RESULT_O): $(RESULT_C) $(RESULT_H)
+	mkdir -p $(BUILD)
 	$(CC) $(CFLAGS) -c $< -o $@
 
 $(PASS_FAIL_O): $(PASS_FAIL_C) $(PASS_FAIL_H)
+	mkdir -p $(BUILD)
 	$(CC) $(CFLAGS) -c $< -o $@
 
 $(G_ASSERT_O): $(G_ASSERT_C) $(G_ASSERT_H) $(GREGTEST_H)
+	mkdir -p $(BUILD)
 	$(CC) $(CFLAGS) -c $< -o $@
 
 $(G_EXPECT_CALL_O): $(G_EXPECT_CALL_C) $(G_EXPECT_CALL_H) $(GREGTEST_H)
+	mkdir -p $(BUILD)
 	$(CC) $(CFLAGS) -c $< -o $@
 	
 clean:
